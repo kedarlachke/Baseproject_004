@@ -1,0 +1,167 @@
+table{
+    border-collapse: collapse;
+}
+
+thead tr{
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 2px solid #f0f0f0;   
+}
+
+thead td{
+    font-weight: 700;
+    border: 1px solid var(--quarterly-color)
+}
+td{
+    padding:.1rem 1rem;
+    font-size: .9rem;
+    color: var(--secondary-color);
+    border: 1px solid var(--table-border-color)
+}
+.pagination{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+ 
+    border-bottom: 1px solid var(--table-border-color);
+    border-left: 1px solid var(--table-border-color);
+    border-right: 1px solid var(--table-border-color);
+    padding: 7px;
+}
+
+.page-n{
+    display: flex;
+    min-width: 40px;
+    height: 40px;
+    border: 1px solid #848484;
+    background: #fff;
+    /* padding: 2px 10px; */
+    margin: 3px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-n .active{
+    color: red;
+}
+
+
+.pagination-btn ,.pagination-input{
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    margin: 2px;
+    color:var(--secondary-color);
+    background:(--quarterly-color)
+}
+
+.pageination-section{
+    display: flex;
+    width: 100%;
+    flex:1;
+    justify-content: center;
+}
+
+.item-per-page{
+    display: flex;
+    width: 100%;
+    flex:1;
+    justify-content: flex-end;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 1rem;
+}
+
+.item-per-page select{
+    
+    height: 40px;
+    font-size: large;
+    width: 70px;
+
+}
+
+.page-of{
+    display: flex;
+    width: 100%;
+    flex:1;
+    justify-content: flex-start;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 1rem;
+    color: var(--secondary-color);
+}
+
+.table-button.danger {
+    color: #FF5C58;
+}   
+
+.table-button.submit {       
+    color: var(--third-color);         
+}   
+   
+.table-button{
+    display: block;
+    padding: 7px;
+    text-align: center;
+    border-radius: 5px;
+    color: var(--quarterly-color);
+    width: 40px; 
+    margin: 2px; 
+    cursor: pointer;
+} 
+   
+.table-button-container{
+    display: flex;
+    
+}    
+
+/* tr {
+    border: 1px solid (--quarterly-color);
+} */
+
+thead tr td {
+    background-color: var(--main-color);
+    color: var(--quarterly-color);
+    padding: 10px;
+    border:1px solid var(--main-color)
+}
+
+/* tr:nth-child(even) {
+    background-color: var(--quarterly-color);
+} */
+
+tr:hover {
+    background: #e7f6fa;
+}
+
+.card-header .table-header-text {
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+color:var(--secondary-color);
+}
+
+.card-header .table-header-text span{
+    font-size: 14px;
+    padding: .4rem 0 0 .5rem;
+}
+
+.goble-search input, .pagination select {
+    outline: none;
+    border-width: 0;
+    border-style: none;
+    border: 1px solid var(--table-border-color);
+    color: var(--secondary-color);
+    padding-left: 10px;
+}
+.goble-search input::placeholder{
+    color:#a3a3a3
+}
+
+.goble-search i{
+    padding:12px;
+    background: var(--main-color);
+    color: #FBFFFF;
+}
+

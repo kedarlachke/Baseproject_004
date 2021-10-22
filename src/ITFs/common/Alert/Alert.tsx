@@ -1,0 +1,20 @@
+import React, { useEffect, useState } from 'react'
+import './alert.css'
+function Alert({snackbaropen,snackbarseverity,handlesnackbarclose,snackbartext}:any) {
+    const [displayAlert, setDisplayAlert] = useState(false);
+    useEffect(() => {
+        setDisplayAlert(snackbaropen)
+        setTimeout(()=>{handlesnackbarclose();setDisplayAlert(false)},5000)
+    }, [snackbaropen])
+    return (
+        <div className={displayAlert?`alert ${snackbarseverity} show`:`alert ${snackbarseverity} hide`}>
+            <span className={snackbarseverity === 'success'? "fas fa-check-circle":"fas fa-exclamation-circle"}></span>
+            <span className="msg">{snackbartext}</span>
+            <span className="close-btn" onClick={()=>{handlesnackbarclose();setDisplayAlert(displayAlert)}}>
+                <span className="fas fa-times"></span>
+            </span>
+        </div>
+    )
+}
+
+export default React.memo(Alert)
