@@ -4,7 +4,7 @@ import ColumnHead from './ColumnHead'
 import {Pagination} from './Pagination';
 import SMIconButton from './SMIconButton';
 function Table(props: any) {
-    let { data,actions,actionColWidth,headerText} = props
+    let { data,actions,actionColWidth,headerText,addNew} = props
     const [selectedColumn, setSelectedColumn] = useState("");
     const [order, setOrder] = useState("");
     const [activePage, setActivePage] = useState(1);
@@ -66,11 +66,11 @@ function Table(props: any) {
             {/* {renderChildren(props.children)} */}
             
                     <div className="card-header">
-                        <div className="table-header-text">
+                        {/* <div className="table-header-text">
                             <h3>{headerText}</h3><span>({data.length})</span>
-                        </div>
+                        </div> */}
                         <div className="goble-search"><input placeholder="search" style={{height:'40px',fontSize:"16px"}} onChange={(e)=>{globalSearch(e.target.value)}}/><i className="fas fa-search"/></div>
-                        
+                        <button className="tabel-add-button" onClick={()=>addNew("NO-ID",true)}>Add new <span className="las la-arrow-right"></span></button>
                         
                     </div>
                     <div className="card-body">

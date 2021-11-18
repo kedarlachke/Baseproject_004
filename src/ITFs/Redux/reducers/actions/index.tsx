@@ -13,7 +13,7 @@ import SignUpUsernameJWT from '../../../mutations/signUpUsernameJWT';
 import CurrentUser from '../../../queries/CurrentUser';
 import CurrentUserJWT from '../../../queries/CurrentUserJWT';
 import usersQuery from '../../../queries/usersQuery';
-
+import recommendationQuery from '../../../queries/recommendationQuery'
 
 import {execGql,execGql_xx} from '../../../gqlclientconfig';
 const AUTH_USER = 'AUTH_USER';
@@ -53,6 +53,30 @@ return function(dispatch:any){
 
 }
 
+}
+
+export async function getRecommendations(values:any) {
+  var result:any = '', errorMessage = '', errors = new Array();
+  try {
+      result = await execGql('query', recommendationQuery, values)
+  }
+  catch (err:any) {
+      errors = err.errorsGql;
+      errorMessage = err.errorMessageGql;
+      console.log({ "errors": errors, "errorMessage": errorMessage })
+      // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+  }
+  if (!result) {
+
+      console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+      return [];
+
+      // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+  }
+  else {
+      //return result.data;
+      return result.data.recommendations;
+  }
 }
 
 

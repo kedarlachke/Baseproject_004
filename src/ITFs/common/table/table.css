@@ -165,3 +165,11 @@ color:var(--secondary-color);
     color: #FBFFFF;
 }
 
+.tabel-add-button{
+    background: transparent !important;
+    color: var(--main-color) !important;
+    border-radius: 5px !important;
+    border: 1px solid var(--main-color) !important;
+    font-weight: 400;
+    letter-spacing: 2px;
+}

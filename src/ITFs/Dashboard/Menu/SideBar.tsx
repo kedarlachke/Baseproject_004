@@ -13,10 +13,10 @@ export function SideBar1(props: any) {
       active: '',
     },
     {
-      name: 'Customers',
+      name: 'Recommendations',
       component: '',
-      slug: '/Customers',
-      iconName: 'las la-users',
+      slug: '/Recommendations',
+      iconName: 'las fa-comment-alt',
       active: '',
     },
     {
@@ -58,7 +58,7 @@ export function SideBar1(props: any) {
       name: 'Users',
       component: '',
       slug: '/Users',
-      iconName: 'las la-power-off',
+      iconName: 'las la-users',
       active: 'active',
     },
     {

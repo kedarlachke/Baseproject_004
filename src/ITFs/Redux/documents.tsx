@@ -89,7 +89,7 @@ let docnos = [...arrdocnos]
    docs=  docs.concat(addDoctype(masterdata.paymodes,doctypes.PAYMODE))
    docs=  docs.concat(addDoctype(masterdata.payterms,doctypes.PAYTERM))
    docs=  docs.concat(addDoctype(masterdata.states,doctypes.STATE))
-
+   docs=  docs.concat(addDoctype(masterdata.recommendations,doctypes.RECOMMENDATION))
 
     return docs;
   
@@ -153,6 +153,7 @@ export const documents = (state={
     transactions:[],
     leads:[],
     users:[],
+    recommendations:[],
     currentcmpn:'',
   },action:any) =>
 {
@@ -236,8 +237,17 @@ export const documents = (state={
                 break;
 
 
+
+                case doctypes.RECOMMENDATION:
+                  return {...state,errMess:null,
+                    documents:state.documents.filter((document:any) => (document._id!==action.payload._id )),
+                    recommendations:state.recommendations.filter((document:any) => (document._id!==action.payload._id ))
+                  };
+                  break;
+
+
           default:
-            return {...state,errMess:null,documents:documents,docnos:docnos};  
+            return {...state,errMess:null,documents:state.documents,docnos:state.docnos};  
         }
         
         case ActionTypes.ADD_MASTERDOCS:
@@ -331,6 +341,10 @@ export const documents = (state={
           return {...state,errMess:null,documents:documents,docnos:docnos,leads:leads};  
           break;
 
+          case doctypes.RECOMMENDATION:
+          let recommendations=saveDocument(state.recommendations,documentForSave)
+          return {...state,errMess:null,documents:documents,docnos:docnos,recommendations:recommendations};  
+          break;
 
 
 

@@ -1,7 +1,14 @@
 import React, { useState } from 'react'
 import './datepicker.css'
 import { FlatInput } from '../InputFields/Input/Input'
-
+import {
+  setValue, getValue, getErrorValue, getErrorValueN, setCalValue,
+  getDtFormat,
+  getTimeFormat,
+  getDateYYYYMMDD,
+  getDateYYYYMMDDHHMI,
+  getFromToDate
+} from '../validationlib';
 function DatePicker(props: any) {
   const [toggle, setToggle] = useState(false)
 
@@ -148,20 +155,24 @@ function DatePicker(props: any) {
     }
     return arr
   }
-  const { wd, errormsg, label, name, value } = props
+  
+  const { wd, label, name, section, currdoc,modifydoc,cal } = props
+  let classname = 'input-field'
+  const errorMsg = getErrorValueN(currdoc, 'errorsAll.' + section)
+  if (errorMsg !== null) {
+    if (errorMsg !== undefined && errorMsg.length > 0) {
+      classname = 'error-input-field'
+    }
+  }
   return (
     <div
       className={`date-picker col-${wd}`}
       onClick={!toggle ? toggleDatePicker : () => {}}
     >
       {/* <div className="selected-date">{formatDate(finalDate,"")}</div> */}
-      <FlatInput
-        label={label}
-        name={name}
-        value={formatDate(finalDate, '')}
-        
-      />
-    <div className="field-error">{errormsg}</div>
+
+<FlatInput wd="12" label={label} name={label} currdoc={currdoc} section={section} modifydoc={modifydoc} />
+    <div className="field-error">{errorMsg}</div>
       <div className={toggle ? 'dates active' : 'dates'}>
         <div className="month">
           <div className="arrows prev-mth" onClick={goToPrevMonth}>
@@ -193,7 +204,8 @@ function DatePicker(props: any) {
           <div
             className="date-ok-button"
             onClick={() => {
-              toggleDatePicker(), setFinalDate({ ...SelectedDate })
+              toggleDatePicker(); setFinalDate({ ...SelectedDate });
+              setCalValue(currdoc, section, formatDate({ ...SelectedDate }, ''), modifydoc, cal)
             }}
           >
             OK

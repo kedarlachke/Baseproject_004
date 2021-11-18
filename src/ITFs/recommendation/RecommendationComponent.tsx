@@ -8,10 +8,10 @@ import * as doctypes from '../common/Doctypes';
 import saveUser from '../mutations/saveUsername'
 import { getDocs, getDocconfig, getLblVal, checkTouched, nvl, checkItem, isCheckedbool, getDocumenForSave } from '../common/CommonLogic';
 import shortid from 'shortid'
-import { deleteDocument,saveDocument,addusers } from '../Redux/ActionCreators'
+import { deleteDocument,saveDocument,addrecommendations } from '../Redux/ActionCreators'
 import deleteUser from '../mutations/deleteUsername';
 import { execGql, execGql_xx } from '../gqlclientconfig';
-import usersQuery from '../queries/usersQuery'
+//import recommendationsQuery from '../queries/recommendationsQuery'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
 import Loader from '../common/Loader/Loader'
@@ -35,7 +35,7 @@ import {
 import AppbarBottom from '../common/AppBarBottom/AppbarBottom'
 
 
-const usexoptions = [{ 'key': 'M', 'value': 'Male' }, { 'key': 'F', 'value': 'Female' }, { 'key': 'NTD', 'value': 'Not disclosed' }]
+const timeframeoptions = [{ 'key': '3-6', 'value': '3-6 mth' }, { 'key': '6-9', 'value': '6-9 mth' }, { 'key': '9-12', 'value': '9-12 mth' }]
 const countryoptions = [{ 'key': 'IN', 'value': 'India' }, { 'key': 'GE', 'value': 'Germany' }, { 'key': 'US', 'value': 'USA' }]
 
 const handleSaveuser = async (currentdocument: any) => {
@@ -111,8 +111,8 @@ const newDocument = (cmpn: any, docno: string) => {
   const newdoc={...initDocumentstatus}
   return {...newdoc,
     cmpn: cmpn,
-    doctype: doctypes.USER,
-    doctypetext: 'User',
+    doctype: doctypes.RECOMMENDATION,
+    doctypetext: 'Recommendation',
     docno: docno,
     status: 'active',
     validatemode: 'touch'
@@ -126,10 +126,10 @@ const initcurrdoc = {
 }
 
 
-export async function getUsers1(values: any) {
+export async function getrecommendations1(values: any) {
   var result: any = '', errorMessage = '', errors = new Array();
   try {
-    result = await execGql('query', usersQuery, values)
+    result = await execGql('query', recommendationsQuery, values)
   }
   catch (err:any) {
     errors = err.errorsGql;
@@ -146,22 +146,16 @@ export async function getUsers1(values: any) {
   }
   else {
     //return result.data;
-    return result.data.users;
+    return result.data.recommendations;
   }
 }
 
-export const handleSaveCheck = (currentdocument:any, users:any) => {
+export const handleSaveCheck = (currentdocument:any, recommendations:any) => {
   const { touched, username, firstname, password, repeatpassword, validatemode } = currentdocument;
   let isNew = false;
-  let username_check = runCheck(nvl(username, ''), [requiredCheck]);
-  let firstname_check = runCheck(nvl(firstname, ''), [requiredCheck]);
-  let password_check = runCheck(nvl(password, ''), [requiredCheck]);
-  let repeatpassword_check = runCheck(nvl(repeatpassword, ''), [requiredCheck]);
-  if (password_check == '' && repeatpassword_check == '') {
-    if (password != repeatpassword)
-      password_check = 'Password & Repeat Password should be same'
-  }
-
+  let name_check = ''//runCheck(nvl(username, ''), [requiredCheck]);
+  let sl_check = ''//runCheck(nvl(firstname, ''), [requiredCheck]);
+ 
 
   let docid:string;
 
@@ -173,27 +167,25 @@ export const handleSaveCheck = (currentdocument:any, users:any) => {
   }
 
 
-  if (users != null) {
+  // if (recommendations != null) {
 
-    users.forEach(
-      (user:any) => {
-        if (user.username == username && user._id != docid && username_check == '') {
-          username_check = 'Username already in Use';
-        }
-      }
-    )
+  //   recommendations.forEach(
+  //     (user:any) => {
+  //       if (user.username == username && user._id != docid && username_check == '') {
+  //         username_check = 'Username already in Use';
+  //       }
+  //     }
+  //   )
 
-  }
+  // }
 
 
 
 
   if (validatemode == 'save') {
     currentdocument.errorsAll = {
-      firstname: firstname_check,
-      password: password_check,
-      username: username_check,
-      repeatpassword: repeatpassword_check
+      name: name_check,
+      sl: sl_check,
     }
 
 
@@ -204,10 +196,9 @@ export const handleSaveCheck = (currentdocument:any, users:any) => {
   if (validatemode == 'touch' && touched != null) {
 
     currentdocument.errorsAll = {
-      firstname: checkTouched(nvl(touched.firstname, false), firstname_check),
-      username: checkTouched(nvl(touched.username, false), username_check),
-      password: checkTouched(nvl(touched.password, false), password_check),
-      repeatpassword: checkTouched(nvl(touched.repeatpassword, false), repeatpassword_check)
+      name: checkTouched(nvl(touched.name, false), name_check),
+      sl: checkTouched(nvl(touched.sl, false), sl_check),
+  
 
     }
   }
@@ -229,7 +220,7 @@ const initDocumentstatus = {
   dailogtitle:"",
   dailogtext:""
 }
-export const UserComponent = (props: any) => {
+export const RecommendationComponent = (props: any) => {
   const [currentdocument, modifydocument] = useState({})
   const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
   const [redirect, goBack] = useState(false)
@@ -239,18 +230,18 @@ export const UserComponent = (props: any) => {
     setDocumentstatus(docstatus)
   }
      useEffect(() => {
-      const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
+      const { currentcmpn, deleteDocument, saveDocument, docnos, recommendations, addrecommendations } = props;
       let _id=new URLSearchParams(props.location.search).get("_id")
 
        if(_id!='NO-ID')
         {
-            const curdoc= props.users.find((document:any)=>document._id==_id)
+            const curdoc= props.recommendations.find((document:any)=>document._id==_id)
          modifydocument(curdoc)
         }
 
         if(_id=='NO-ID')
         {   
-            let docno= getDocNo(currentcmpn,doctypes.USER,'',docnos)
+            let docno= getDocNo(currentcmpn,doctypes.RECOMMENDATION,'',docnos)
             modifydocument(newDocument(currentcmpn,docno))
         }
          
@@ -259,10 +250,10 @@ export const UserComponent = (props: any) => {
         }
     }, [props._id])
   const setDocumentAction = async (action: string) => {
-    const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
+    const { currentcmpn, deleteDocument, saveDocument, docnos, recommendations, addrecommendations } = props;
     let currentDoc:any = { ...currentdocument }
-    currentDoc.doctype = doctypes.USER;
-    currentDoc.doctypetext="User"
+    currentDoc.doctype = doctypes.RECOMMENDATION;
+    currentDoc.doctypetext="Recommendation"
     const { doctypetext, docnoprefix, doctype } = currentDoc;
     let action_type = '';
 
@@ -283,12 +274,14 @@ export const UserComponent = (props: any) => {
         docstatus.dailogtext= 'Delete ' + doctypetext + '?'
         docstatus.yesaction= async () => {
           let docno = getDocNo(currentcmpn, doctype, '', docnos)
-         let a= await handleDeleteuser(currentDoc._id)
+         
+          //await handleDeleteuser(currentDoc._id)
+          deleteDocument(currentDoc._id)
           let newdoc:any = newDocument(currentcmpn, docno);
           modifydocument(newdoc)
-          getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
-            .then(users => {
-              addusers(users)
+          getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
+            .then(recommendations => {
+              addrecommendations(recommendations)
             })
             .catch(err => { console.log(err) })
             docstatus.action= false;
@@ -330,7 +323,7 @@ export const UserComponent = (props: any) => {
 
       case 'save':
         currentDoc.validatemode = 'save';
-        currentDoc = handleSaveCheck(currentDoc, users);
+        currentDoc = handleSaveCheck(currentDoc, recommendations);
         let isSaveOk = !Object.keys(currentDoc.errorsAll).some((x: any) => currentDoc.errorsAll[x]);
         currentDoc = getDocumenForSave(currentDoc)
         if (!isSaveOk) {
@@ -354,25 +347,26 @@ export const UserComponent = (props: any) => {
             else {
               nextdocno = dbdocno
             }
-            await handleSaveuser(currentDoc)
-            modifydocument(currentDoc)
-            getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' }).then(users => {
-              addusers(users)
-            }).catch(err => { console.log(err) })
+            await saveDocument(currentDoc)
+
+            // getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' }).then(recommendations => {
+            //   addrecommendations(recommendations)
+            // }).catch(err => { console.log(err) })
           }
           else {
-            let retdoc=await handleSaveuser(currentDoc)
-            modifydocument({...retdoc.saveUsername})
-            getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
-              .then(users => {
-                addusers(users)
-              })
-              .catch(err => { console.log(err) })
+            await saveDocument(currentDoc)
+            modifydocument(currentDoc)
+            // getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
+            //   .then(recommendations => {
+            //     addrecommendations(recommendations)
+            //   })
+            //   .catch(err => { console.log(err) })
           }
           docstatus.snackbaropen = true;
           docstatus.snackbarseverity = 'success';
           docstatus.snackbartext = doctypetext + ' Saved';
           setDocumentstatus(docstatus);
+
         }
         break;
     }
@@ -385,7 +379,7 @@ export const UserComponent = (props: any) => {
   }
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   if(redirect){
-    let redirectpath='/Users'
+    let redirectpath='/Recommendations'
     return <Redirect push to={redirectpath} />;
 
      
@@ -395,87 +389,48 @@ export const UserComponent = (props: any) => {
     <div className="container">
       <div className="grid">
         <div className="row">
-
-          <FlatInput wd="3" label="First Name" name="firstname" currdoc={currentdocument} section={'firstname'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="Last Name" name="lastname" currdoc={currentdocument} section={'lastname'} modifydoc={modifydocument} />
-          <FlatInput wd="6" label="Display Name" name="displayname" currdoc={currentdocument} section={'displayname'} modifydoc={modifydocument} />
-        </div>
-        <div className="row">
-          <FlatInput wd="3" label="User Name" name="username" currdoc={currentdocument} section={'username'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="Password" name="password" currdoc={currentdocument} section={'password'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="Re-Type Password" name="password" currdoc={currentdocument} section={'repeatpassword'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Name" name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
+          <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Current market price" name="cmp" currdoc={currentdocument} section={'cmp'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
         </div>
         <div className="row">
-          <FlatInput wd="3" label="Email" name="email" currdoc={currentdocument} section={'email'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="Mobile" name="mobile" currdoc={currentdocument} section={'mobile'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="Phone No." name="phone" currdoc={currentdocument} section={'phone'} modifydoc={modifydocument} />
+        <FlatInput wd="3" label="Add Up To" name="addupto" currdoc={currentdocument} section={'addupto'} modifydoc={modifydocument} />
+        <FlatInput wd="3" label="Stop Loss" name="sl" currdoc={currentdocument} section={'sl'} modifydoc={modifydocument} />
+        <div className={"col-6"}></div>
+        </div>
+        <div className="row">
+          <FlatInput wd="3" label="Target 1" name="target1" currdoc={currentdocument} section={'target1'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 2" name="target2" currdoc={currentdocument} section={'target2'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 3" name="target3" currdoc={currentdocument} section={'target3'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
         </div>
         <div className="row">
-          <SelectInput wd="3" label="User Sex" options={usexoptions} name="usex" currdoc={currentdocument} section={'usex'} modifydoc={modifydocument} />
-          {/* <DatePicker wd="3" label="Date of birth"  name="dateofbirth"  currdoc={currentdocument} section={'dateofbirth'} modifydoc={modifydocument} /> */}
-          <div className={"col-6"}></div>
+          <FlatInput wd="3" label="Target 4" name="target4" currdoc={currentdocument} section={'target4'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 5" name="target5" currdoc={currentdocument} section={'target5'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 6" name="target6" currdoc={currentdocument} section={'target6'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
         </div>
+        
         <div className="row">
-          <FlatInput wd="12" label="Address" name="address" currdoc={currentdocument} section={'address'} modifydoc={modifydocument} />
-        </div>
-        <div className="row">
-          <FlatInput wd="3" label="Pin Code" name="pincode" currdoc={currentdocument} section={'pincode'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="City" name="city" currdoc={currentdocument} section={'city'} modifydoc={modifydocument} />
-          <FlatInput wd="3" label="State" name="state" currdoc={currentdocument} section={'state'} modifydoc={modifydocument} />
-          <SelectInput wd="3" label="Country" options={countryoptions} name="country" currdoc={currentdocument} section={'country'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 7" name="target7" currdoc={currentdocument} section={'target7'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 8" name="target8" currdoc={currentdocument} section={'target8'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Target 9" name="target9" currdoc={currentdocument} section={'target9'} modifydoc={modifydocument} />
+          <div className={"col-3"}></div>
 
         </div>
-        {/* <div className="row"><Button
-          wd="2"
-          label="Clear"
-          name="register"
-          className="btn-deault btn-small"
-        />
-        <Button
-          wd="2"
-          label="Back"
-          name="back"
-          className="btn-deault btn-small"
-          onClick={()=>goBack(true)}
-        />
-          <Button
-            wd="2"
-            label="Delete"
-            name="delete"
-            className="btn1 btn-small"
-           onClick={()=>setDocumentAction('delete')}
-           />
-          <Button
-            wd="2"
-            label="Register"
-            name="register"
-            className="btn1 btn-small"
-           onClick={setDocumentAction}
-           
-          />
-          </div> */}
+        <div className="row">  
+          <FlatInput wd="3" label="Weightage" name="weightage" currdoc={currentdocument} section={'weightage'} modifydoc={modifydocument} /> 
+          <SelectInput wd="3" label="Time Frame" options={timeframeoptions} name="timeframe" currdoc={currentdocument} section={'timeframe'} modifydoc={modifydocument} />
+
+          <div className={"col-3"}></div>
+          <div className={"col-3"}></div>
+        </div>
+       
           
       </div>
- <AlertDialog 
-                    open={action}  
-                    handleno={noaction}
-                    handleyes={yesaction}
-                    dailogtext={dailogtext}
-                    dailogtitle={dailogtitle}
-
-                    /> 
-                
-
-
-                    <Messagesnackbar 
-                     snackbaropen={documentstatus.snackbaropen}
-                     snackbarseverity={documentstatus.snackbarseverity}
-                     handlesnackbarclose={closeSnackBar}
-                     snackbartext={documentstatus.snackbartext}
-                    />
+      <AlertDialog open={action}  handleno={noaction} handleyes={yesaction} dailogtext={dailogtext} dailogtitle={dailogtitle}/>           
+      <Messagesnackbar snackbaropen={documentstatus.snackbaropen} snackbarseverity={documentstatus.snackbarseverity} handlesnackbarclose={closeSnackBar} snackbartext={documentstatus.snackbartext}/>
                     
     </div>
     <AppbarBottom setAction={setDocumentAction} handleGoback={goBack}/>
@@ -484,9 +439,10 @@ export const UserComponent = (props: any) => {
 }
 
 const mapStateToProps = (state: any) => {
+  const recdoc = state?.documents?.documents?.filter((document:any) => document.doctype==doctypes.RECOMMENDATION )
 
   return({
-  users:state.documents.users,
+  recommendations:recdoc,
   currentcmpn:state.documents.currentcmpn,
   docnos:state.documents.docnos,
   companies:state.documents.companies,
@@ -508,13 +464,13 @@ const mapDispatchToProps = (dispatch: any) => {
     } },
 
 
-    addusers: (users:any,callback:any) => { dispatch(addusers(users));   
-    if(callback && typeof callback === "function") {
-callback();
-}}
+//     addrecommendations: (recommendations:any,callback:any) => { dispatch(addrecommendations(recommendations));   
+//     if(callback && typeof callback === "function") {
+// callback();
+// }}
 
   
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(UserComponent))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RecommendationComponent))

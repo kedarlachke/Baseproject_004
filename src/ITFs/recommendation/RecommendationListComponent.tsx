@@ -5,8 +5,11 @@ import Table from '../common/table/Table'
 import Column from '../common/table/Column'
 import { Redirect, withRouter } from 'react-router-dom'
 import {addusers} from '../Redux/ActionCreators'
-import { getUsers1 } from '../Redux/reducers/actions'
+import { getRecommendations } from '../Redux/reducers/actions'
+import * as doctypes from '../common/Doctypes';
 export const UserListComponent = (props: any) => {
+
+  const{recommendatios} = props
   const [docno, setDocno] = useState('NO-ID')
   const [redirect, setRedirect] = useState(false)
   const setDocStatus = (id: string, redirect: boolean) => {
@@ -19,7 +22,7 @@ export const UserListComponent = (props: any) => {
   }
 
   useEffect(() => {
-    getUsers1({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((users:any)=>{
+    getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((users:any)=>{
       if(props){
       props.addusers(users)
     }
@@ -30,12 +33,12 @@ export const UserListComponent = (props: any) => {
   }, [])
   let tabledata:any = []
   if(props.users){
-    tabledata =useMemo(() => [...props.users], [props.users])
+    tabledata =useMemo(() => [...props.recommendations], [props.recommendations])
 }
 
   if (redirect) {
-    let redirectpath = '/useredit?_id=' + docno
-    return <Redirect push to={redirectpath} />
+    let redirectpath = '/recommendationedit?_id=' + docno
+    return <Redirect push to={redirectpath} /> 
   } else
     return (
       <div className="projects">
@@ -67,15 +70,11 @@ export const UserListComponent = (props: any) => {
                   }
                 ]}
               >
-                <Column
-                  fieldname="firstname"
-                  columnname="First Name"
-                ></Column>
-
-                <Column fieldname="lastname" columnname="Last Name"></Column>
-                <Column fieldname="username" columnname="User Name"></Column>
-                <Column fieldname="email" columnname="Email Id"></Column>
-                <Column fieldname="mobile" columnname="Phone No."></Column>
+                <Column fieldname="name" columnname="Name"></Column>
+                <Column fieldname="timeframe" columnname="Time Frame"></Column>
+                <Column fieldname="target1" columnname="Target 1"></Column>
+                <Column fieldname="target2" columnname="Target 2"></Column>
+                <Column fieldname="target3" columnname="Target 3"></Column>
               </Table>
             
           </div>
@@ -85,11 +84,16 @@ export const UserListComponent = (props: any) => {
     )
 }
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: any) => {
+  console.log("-------documents----",state.documents.documents)
+  const recdoc = state?.documents?.documents?.filter((document:any) => document.doctype==doctypes.RECOMMENDATION )
+  console.log("-------recdoc----",recdoc)
+  return({
   users: state.documents.users,
   docnos: state.documents.docnos,
   companies: state.documents.companies,
-})
+  recommendations:recdoc
+})}
 
 const mapdispatcherToProp=(dispatch:any)=>{
   return {

@@ -36,6 +36,7 @@ export default  gql`
         lastname
         userauthorisations
         status
+        _id
 	  }
     }
   

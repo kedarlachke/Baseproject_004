@@ -8,7 +8,7 @@ export const TAXTYPE ='TAXTYPE';
 export const TAXRATE ='TAXRATE';
 export const LEAD ='LEAD';
 export const USER ='USER';
-export const RECOMMENDATION="RECOMMENDATION"
+
 export const TRANSACTIONTYPES ='TRANSACTIONTYPES';
 
 
@@ -17,3 +17,6 @@ export const STATE='STATE';
 export const GLACCOUNT ='GLACCOUNT';
 export const PAYMODE ='PAYMODE';
 export const PAYTERM='PAYTERM';
+
+
+export const RECOMMENDATION='RECOMMENDATION'
