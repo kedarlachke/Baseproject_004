@@ -12,6 +12,7 @@ export const UserListComponent = (props: any) => {
   const{recommendatios} = props
   const [docno, setDocno] = useState('NO-ID')
   const [redirect, setRedirect] = useState(false)
+  const [recommendations, setRecommendations] = useState([]) 
   const setDocStatus = (id: string, redirect: boolean) => {
     setDocno(id)
     setRedirect(redirect)
@@ -22,9 +23,9 @@ export const UserListComponent = (props: any) => {
   }
 
   useEffect(() => {
-    getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((users:any)=>{
+    getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((data:any)=>{
       if(props){
-      props.addusers(users)
+        setRecommendations(data)
     }
     });
     return () => {
@@ -32,8 +33,8 @@ export const UserListComponent = (props: any) => {
     }
   }, [])
   let tabledata:any = []
-  if(props.users){
-    tabledata =useMemo(() => [...props.recommendations], [props.recommendations])
+  if(recommendations){
+    tabledata =useMemo(() => [...recommendations], [recommendations])
 }
 
   if (redirect) {

@@ -6,9 +6,9 @@ import { getValue,getDateYYYYMMDDHHMISS } from './validationlib';
 export const getDocumenForSave=(document:any)=>
 {
   let documentForSave=document;
-  if(documentForSave._id=='' || documentForSave._id==null )
+  if(documentForSave.t_id=='' || documentForSave._id==null )
       {
-        documentForSave._id=shortid.generate();
+        documentForSave.t_id=shortid.generate();
       }
       let datetime=getDateYYYYMMDDHHMISS(new Date());
       let date=datetime.substring(0, 8)

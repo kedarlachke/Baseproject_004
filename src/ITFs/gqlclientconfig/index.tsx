@@ -229,7 +229,7 @@ const clientURL = new ApolloClient({
     
 export const execGql = function(gqlType:any,gqlTypeName:any,gqlVariables:any)
 {
-
+console.log(gqlTypeName,gqlVariables)
     const promise = new Promise((resolve, reject) => {
         
         if(gqlType=='mutation')
