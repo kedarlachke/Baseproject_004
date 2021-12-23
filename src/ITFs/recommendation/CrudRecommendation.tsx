@@ -2,6 +2,7 @@ import { getDocs, getDocconfig, getLblVal, checkTouched, nvl, checkItem, isCheck
 import constant from '../common/constant'
 import recommendationsQuery from '../queries/recommendationQuery'
 import deleteRecommendation from '../mutations/DeleteRecommendation';
+import saveReccomendation from '../mutations/saveReccomendation';
 import { execGql, execGql_xx } from '../gqlclientconfig';
 
 export const handleSave = async (currentdocument: any) => {
