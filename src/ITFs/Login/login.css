@@ -7,7 +7,9 @@
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
 } */
-
+input[type="button"]:disabled, input[type="button"]:hover:disabled{
+  background: #dddddd;
+}
 .login-container {
   position: relative;
   width: 100%;

@@ -6,6 +6,8 @@ import {checkTouched,nvl} from '../common/CommonLogic';
 import {displaySubmitError,displayFieldError,runCheck,minLength10,
   maxLength10,emailCheck,numberCheck,requiredCheck,maxLength128,minLength2} from '../common/validationlib';
 import {connect} from 'react-redux' 
+import ReCAPTCHA from "react-google-recaptcha";
+
 const initobj = {
   applicationid : "15001500", client: "45004500" ,  lang: "EN",
   username: '',
@@ -17,6 +19,7 @@ const initobj = {
 export function SignUpForm(props:any) {
   const [user, setUser] = useState(initobj)
   const [state, setState] = useState(({}))
+  const [captcha ,setCaptcha] = useState(false)
   // useEffect(() => {
   //   handleClearErrors();
   //   updateUser(handleSaveCheck(user))
@@ -112,6 +115,13 @@ const handleSubmit=(currentdocument:any)=>{
  
 } 
 handleSaveCheck(user)
+const onCaptchaChange = (value:any) => {
+  setCaptcha(value);
+
+}
+
+
+
   return (
     <div className="form sign-up-form">
       <h2 className="title">Sign Up:{props.key1}</h2>
@@ -119,7 +129,9 @@ handleSaveCheck(user)
      <M_LeftIconRoundInput  modifydoc={M_updateUser} iconClass="fas fa-phone" name="mobile"  placeholder="Mobile No" currdoc={user} section={"mobile"} label="mobile" wd={"12"}/>
      <M_LeftIconRoundInput  modifydoc={M_updateUser} iconClass="fas fa-envelope" name="email" placeholder="Email" currdoc={user} section={"email"} label="mobile" wd={"12"}/>
      <M_LeftIconRoundInput  modifydoc={M_updateUser} iconClass="fas fa-lock" name="password" placeholder="Password" currdoc={user} section={"password"} label="mobile" wd={"12"}/> 
-      <input type="button" value="Register" className="btn solid" onClick={()=>{handleSubmit(user)}}/>
+     <ReCAPTCHA sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" onChange={()=>{onCaptchaChange(true)}}   />
+     
+      <input type="button" value="Register" className="btn solid" onClick={()=>{handleSubmit(user)} }  disabled = {captcha ? "" : "disabled"}/>
       <div  className="field-error">{state.formErrorMessage}</div>
       <M_SocialMediaLogin label="Sign up" />
     </div>

@@ -1,6 +1,7 @@
 import { getDocs, getDocconfig, getLblVal, checkTouched, nvl, checkItem, isCheckedbool, getDocumenForSave } from '../common/CommonLogic';
 import constant from '../common/constant'
 import recommendationsQuery from '../queries/recommendationQuery'
+import recommendationItems from '../queries/recommendationItemsQuery'
 import deleteRecommendation from '../mutations/DeleteRecommendation';
 import saveReccomendation from '../mutations/saveReccomendation';
 import { execGql, execGql_xx } from '../gqlclientconfig';
@@ -76,6 +77,29 @@ export const handleSave = async (currentdocument: any) => {
     var result: any = '', errorMessage = '', errors = new Array();
     try {
       result = await execGql('query', recommendationsQuery, values)
+      if (!result) {
+        console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+        return [];
+        // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+      }
+      else {
+        //return result.data;
+        return result.data.recommendations;
+      }
+    }
+    catch (err:any) {
+      errors = err.errorsGql;
+      errorMessage = err.errorMessageGql;
+      console.log({ "errors": errors, "errorMessage": errorMessage })
+      // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+    }
+    
+  }
+
+  export async function getRecommendationsItems() {
+    var result: any = '', errorMessage = '', errors = new Array();
+    try {
+      result = await execGql('query', recommendationItems, null)
       if (!result) {
         console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
         return [];

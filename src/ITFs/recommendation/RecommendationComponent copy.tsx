@@ -2,19 +2,16 @@ import React, { useState,useEffect } from 'react'
 import { AnyIfEmpty, connect } from 'react-redux'
 import { Button } from '../common/Button/Button'
 import DatePicker from '../common/DatePicker/DatePicker'
-import constant from '../common/constant'
 import { FlatInput } from '../common/InputFields/Input/Input'
 import { SelectInput } from '../common/InputFields/Select/Select'
-import { SearchSelectInput } from '../common/InputFields/Select/SearchSelect'
 import * as doctypes from '../common/Doctypes';
-import saveReccomendation from '../mutations/saveReccomendation'
+import saveUser from '../mutations/saveUsername'
 import { getDocs, getDocconfig, getLblVal, checkTouched, nvl, checkItem, isCheckedbool, getDocumenForSave } from '../common/CommonLogic';
 import shortid from 'shortid'
-import { deleteDocument,saveDocument,addusers } from '../Redux/ActionCreators'
-import deleteRecommendation from '../mutations/DeleteRecommendation';
+import { deleteDocument,saveDocument,addrecommendations } from '../Redux/ActionCreators'
+import deleteUser from '../mutations/deleteUsername';
 import { execGql, execGql_xx } from '../gqlclientconfig';
-import recommendationsQuery from '../queries/recommendationQuery'
-import {handleDelete, getRecommendations,handleSave,getRecommendationsItems} from './CrudRecommendation'
+//import recommendationsQuery from '../queries/recommendationsQuery'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
 import Loader from '../common/Loader/Loader'
@@ -36,141 +33,159 @@ import {
   Redirect,
   withRouter } from 'react-router-dom'
 import AppbarBottom from '../common/AppBarBottom/AppbarBottom'
-import Select from 'react-select'
-import Option  from './arrNames'
 
-// const handleSave = async (currentdocument: any) => {
-//   var result: any = '', errorMessage = '', errors = new Array();
-//   return new Promise<void>(async(resolve, reject) => {
-    
+
+const timeframeoptions = [{ 'key': '3-6', 'value': '3-6 mth' }, { 'key': '6-9', 'value': '6-9 mth' }, { 'key': '9-12', 'value': '9-12 mth' }]
+const countryoptions = [{ 'key': 'IN', 'value': 'India' }, { 'key': 'GE', 'value': 'Germany' }, { 'key': 'US', 'value': 'USA' }]
+
+const handleSaveuser = async (currentdocument: any) => {
+  var result: any = '', errorMessage = '', errors = new Array();
+  try {
+    let userForSave = {
+      email: nvl(currentdocument.email, ''),
+      password: nvl(currentdocument.password, ''),
+      applicationid: '15001500',
+      client: '45004500',
+      lang: 'EN',
+      mobile: nvl(currentdocument.mobile, ''),
+      username: nvl(currentdocument.username, ''),
+      firstname: nvl(currentdocument.firstname, ''),
+      lastname: nvl(currentdocument.lastname, ''),
+      userauthorisations: nvl(currentdocument.userauthorisations, ''),
+      authorisations: nvl(currentdocument.authorisations, ''),
+      status: nvl(currentdocument.status, '')
+    }
+    result = await execGql('mutation', saveUser, userForSave)
+  }
+  catch (err:any) {
+    errors = err.errorsGql;
+    errorMessage = err.errorMessageGql;
+    console.log({ "errors": errors, "errorMessage": errorMessage })
+    // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+  }
+  if (!result) {
+    console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+    // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+  }
+  else {
+    return result.data;
+  }
+}
+
+const handleDeleteuser = async (_id: string) => {
+  var result: any = '', errorMessage = '', errors = new Array();
+  try {
+    result = await execGql('mutation', deleteUser, { _id })
+    if (!result) {
+    console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+    // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+  }
+  else {
+    return result.data;
+  }
+  }
+  catch (err:any) {
+    errors = err.errorsGql;
+    errorMessage = err.errorMessageGql;
+    console.log({ "errors": errors, "errorMessage": errorMessage })
+    // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+  }
   
-//   try {
-//     let userForSave = {
-//       ...constant,
-//       name: nvl(currentdocument.name, ''),
-//       recodate: nvl(currentdocument.recodate, ''),
-//       cmp: nvl(currentdocument.cmp, ''),
-//       addupto: nvl(currentdocument.addupto, ''),
-//       sl: nvl(currentdocument.sl, ''),
-//       target1: nvl(currentdocument.target1, ''),
-//       target2: nvl(currentdocument.target2, ''),
-//       target3: nvl(currentdocument.target3, ''),
-//       target4: nvl(currentdocument.target4, ''),
-//       target5: nvl(currentdocument.target5, ''),
-//       target6: nvl(currentdocument.target6, ''),
-//       target7: nvl(currentdocument.target7, ''),
-//       target8: nvl(currentdocument.target8, ''),
-//       target9: nvl(currentdocument.target9, ''),
-      
-//       weightage: nvl(currentdocument.weightage, ''),
-//       timeframe: nvl(currentdocument.timeframe, ''),
-//       _id:nvl(currentdocument._id, ''),
-//       t_id:nvl(currentdocument.t_id, ''),
-//     }
-//     result = await execGql('mutation', saveReccomendation, userForSave)
-//     if (!result) {
-//       console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
-//       reject({ "errors": [], "errorMessage": 'No errors and results from GQL' })
-//     }
-//     else {
-//       resolve(result.data)
-//       return result.data;
-//     }
-//   }
-//   catch (err:any) {
-//     errors = err.errorsGql;
-//     errorMessage = err.errorMessageGql;
-//     console.log({ "errors": errors, "errorMessage": errorMessage })
-//   }
-  
-// }) 
-// }
+}
 
-// const handleDelete = async (_id: string) => {
-//   var result: any = '', errorMessage = '', errors = new Array();
-//   try {
-//     result = await execGql('mutation', deleteRecommendation, { _id })
-//     if (!result) {
-//     console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
-//     // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
-//   }
-//   else {
-//     return result.data;
-//   }
-//   }catch (err:any) {
-//     errors = err.errorsGql;
-//     errorMessage = err.errorMessageGql;
-//     console.log({ "errors": errors, "errorMessage": errorMessage })
-//     // return callback({"errors":errors,"errorMessage":errorMessage},'' );
-//   }
-  
-// }
+const getDocNo = (currentcmpn: any, doctype: string, docnoprefix: string, docnos: any) => {
+  var docno = '1';
+  var i;
+  if (docnos != null) {
+    for (i = 0; i < docnos.length; i++) {
+      if (docnos[i].cmpn == currentcmpn && docnos[i].doctype == doctype && docnos[i].docnoprefix == docnoprefix) {
+        docno = docnos[i].docno;
+        docno = (parseInt(docno) + 1).toString();
+      }
+    }
+  }
+  return docno;
+}
 
-
-
-const newDocument = () => {
+const newDocument = (cmpn: any, docno: string) => {
   const newdoc={...initDocumentstatus}
   return {...newdoc,
+    cmpn: cmpn,
     doctype: doctypes.RECOMMENDATION,
     doctypetext: 'Recommendation',
+    docno: docno,
+    status: 'active',
     validatemode: 'touch'
   }
 };
 
 
-// const initcurrdoc = {
-//  cmpn:{}, applicationid: "15001500", client: "45004500", lang: "EN", doctype: "",
-//   doctypetext: "", docnoprefix: "", _id: "", docno: "", validatemode: "", errorsAll: []
-// }
+const initcurrdoc = {
+ cmpn:{}, applicationid: "15001500", client: "45004500", lang: "EN", doctype: "",
+  doctypetext: "", docnoprefix: "", _id: "", docno: "", validatemode: "", errorsAll: []
+}
 
 
-// export async function getRecommendations(values: any) {
-//   var result: any = '', errorMessage = '', errors = new Array();
-//   try {
-//     result = await execGql('query', recommendationsQuery, values)
-//     if (!result) {
-//       console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
-//       return [];
-//       // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
-//     }
-//     else {
-//       //return result.data;
-//       return result.data.recommendations;
-//     }
-//   }
-//   catch (err:any) {
-//     errors = err.errorsGql;
-//     errorMessage = err.errorMessageGql;
-//     console.log({ "errors": errors, "errorMessage": errorMessage })
-//     // return callback({"errors":errors,"errorMessage":errorMessage},'' );
-//   }
-  
-// }
+export async function getrecommendations1(values: any) {
+  var result: any = '', errorMessage = '', errors = new Array();
+  try {
+    result = await execGql('query', recommendationsQuery, values)
+  }
+  catch (err:any) {
+    errors = err.errorsGql;
+    errorMessage = err.errorMessageGql;
+    console.log({ "errors": errors, "errorMessage": errorMessage })
+    // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+  }
+  if (!result) {
 
-export const handleSaveCheck = (currentdocument:any) => {
-  const { touched, name, recodate, cmp, addupto, sl,target1,target2,weightage,timeframe,validatemode } = currentdocument;
+    console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+    return [];
+
+    // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+  }
+  else {
+    //return result.data;
+    return result.data.recommendations;
+  }
+}
+
+export const handleSaveCheck = (currentdocument:any, recommendations:any) => {
+  const { touched, username, firstname, password, repeatpassword, validatemode } = currentdocument;
   let isNew = false;
-  let name_check = runCheck(nvl(name, ''), [requiredCheck]);
-  let recodate_check = runCheck(nvl(recodate, ''), [requiredCheck]);
-  let cmp_check = runCheck(nvl(cmp, ''), [requiredCheck]);
-  let addupto_check = runCheck(nvl(addupto, ''), [requiredCheck]);
-  let sl_check = runCheck(nvl(sl, ''), [requiredCheck]);
-  let target1_check = runCheck(nvl(target1, ''), [requiredCheck]);
-  let target2_check = runCheck(nvl(target2, ''), [requiredCheck])
-  let weightage_check = runCheck(nvl(weightage, ''), [requiredCheck]);
-  let timeframe_check = runCheck(nvl(timeframe, ''), [requiredCheck]);
+  let name_check = ''//runCheck(nvl(username, ''), [requiredCheck]);
+  let sl_check = ''//runCheck(nvl(firstname, ''), [requiredCheck]);
+ 
+
+  let docid:string;
+
+  if (currentdocument._id == null || currentdocument._id == '') {
+    docid = 'NO-ID'
+  }
+  else {
+    docid = currentdocument._id
+  }
+
+
+  // if (recommendations != null) {
+
+  //   recommendations.forEach(
+  //     (user:any) => {
+  //       if (user.username == username && user._id != docid && username_check == '') {
+  //         username_check = 'Username already in Use';
+  //       }
+  //     }
+  //   )
+
+  // }
+
+
+
+
   if (validatemode == 'save') {
     currentdocument.errorsAll = {
       name: name_check,
-      recodate: recodate_check,
-      cmp: cmp_check,
-      addupto: addupto_check,
-
       sl: sl_check,
-      target1: target1_check,
-      target2: target2_check,
-      weightage: weightage_check,
-      timeframe: timeframe_check,
     }
 
 
@@ -182,25 +197,14 @@ export const handleSaveCheck = (currentdocument:any) => {
 
     currentdocument.errorsAll = {
       name: checkTouched(nvl(touched.name, false), name_check),
-      recodate: checkTouched(nvl(touched.username, false), recodate_check),
-      cmp: checkTouched(nvl(touched.password, false), cmp_check),
-      addupto: checkTouched(nvl(touched.repeatpassword, false), addupto_check),
-      sl: checkTouched(nvl(touched.name, false), sl_check),
-      target1: checkTouched(nvl(touched.username, false), target1_check),
-      target2: checkTouched(nvl(touched.password, false), target2_check),
-      weightage: checkTouched(nvl(touched.repeatpassword, false), weightage_check),
-      timeframe: checkTouched(nvl(touched.repeatpassword, false), timeframe_check),
+      sl: checkTouched(nvl(touched.sl, false), sl_check),
+  
 
     }
   }
 
   return currentdocument;
 }
-const options = [
-  { value: 'chocolate', label: 'Chocolate' },
-  { value: 'strawberry', label: 'Strawberry' },
-  { value: 'vanilla', label: 'Vanilla' }
-]
 const initDocumentstatus = {
   docconfig: {},
   currentdocument: {},
@@ -216,8 +220,6 @@ const initDocumentstatus = {
   dailogtitle:"",
   dailogtext:""
 }
-const timeframeoptions = [{ 'key': '3-6', 'value': '3-6 mth' }, { 'key': '6-9', 'value': '6-9 mth' }, { 'key': '9-12', 'value': '9-12 mth' }]
-
 export const RecommendationComponent = (props: any) => {
   const [currentdocument, modifydocument] = useState({})
   const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
@@ -228,20 +230,19 @@ export const RecommendationComponent = (props: any) => {
     setDocumentstatus(docstatus)
   }
      useEffect(() => {
-      const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
+      const { currentcmpn, deleteDocument, saveDocument, docnos, recommendations, addrecommendations } = props;
       let _id=new URLSearchParams(props.location.search).get("_id")
-      getRecommendationsItems().then((item)=>{console.log("item---->",item)})
+
        if(_id!='NO-ID')
         {
-           getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN', _id}).then((data:any)=>{ 
-                modifydocument(data[0])
-            });
-        
+            const curdoc= props.recommendations.find((document:any)=>document._id==_id)
+         modifydocument(curdoc)
         }
 
         if(_id=='NO-ID')
         {   
-            modifydocument(newDocument())
+            let docno= getDocNo(currentcmpn,doctypes.RECOMMENDATION,'',docnos)
+            modifydocument(newDocument(currentcmpn,docno))
         }
          
         return () => {
@@ -249,7 +250,7 @@ export const RecommendationComponent = (props: any) => {
         }
     }, [props._id])
   const setDocumentAction = async (action: string) => {
-    const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
+    const { currentcmpn, deleteDocument, saveDocument, docnos, recommendations, addrecommendations } = props;
     let currentDoc:any = { ...currentdocument }
     currentDoc.doctype = doctypes.RECOMMENDATION;
     currentDoc.doctypetext="Recommendation"
@@ -272,14 +273,22 @@ export const RecommendationComponent = (props: any) => {
         docstatus.dailogtitle= doctypetext + ' Deletion';
         docstatus.dailogtext= 'Delete ' + doctypetext + '?'
         docstatus.yesaction= async () => {
+          let docno = getDocNo(currentcmpn, doctype, '', docnos)
          
-          await handleDelete(currentDoc._id)
-          let newdoc:any = newDocument();
+          //await handleDeleteuser(currentDoc._id)
+          deleteDocument(currentDoc._id)
+          let newdoc:any = newDocument(currentcmpn, docno);
           modifydocument(newdoc)
+          getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
+            .then(recommendations => {
+              addrecommendations(recommendations)
+            })
+            .catch(err => { console.log(err) })
             docstatus.action= false;
             docstatus.snackbaropen=true;
             docstatus.snackbarseverity='success';
             docstatus.snackbartext= doctypetext + ' Deleted'
+
             setDocumentstatus({...docstatus})
         }
         docstatus.noaction= () => {
@@ -295,7 +304,8 @@ export const RecommendationComponent = (props: any) => {
         docstatus.dailogtitle= ' Clear ' + doctypetext,
         docstatus.dailogtext = 'Clear un-saved  ' + doctypetext + '?',
         docstatus.yesaction = () => {
-            let newcurdoc:any = newDocument()
+            let docno = getDocNo(currentcmpn, doctype, '', docnos)
+            let newcurdoc:any = newDocument(currentcmpn, docno)
             modifydocument(newcurdoc)
             docstatus.action= false
             docstatus.snackbaropen= true
@@ -313,56 +323,76 @@ export const RecommendationComponent = (props: any) => {
 
       case 'save':
         currentDoc.validatemode = 'save';
-        currentDoc = handleSaveCheck(currentDoc);
+        currentDoc = handleSaveCheck(currentDoc, recommendations);
         let isSaveOk = !Object.keys(currentDoc.errorsAll).some((x: any) => currentDoc.errorsAll[x]);
         currentDoc = getDocumenForSave(currentDoc)
         if (!isSaveOk) {
-          modifydocument({...currentDoc})
+          modifydocument(currentDoc)
           docstatus.snackbaropen = true
           docstatus.snackbarseverity = 'error'
           docstatus.snackbartext = 'Errors found'
           setDocumentstatus(docstatus);
         }
         else {
-           if ( currentDoc.t_id ||currentDoc.t_id === '') {
-             currentDoc.t_id = shortid.generate();
-           }
+          if (currentDoc._id == '' || currentDoc._id == null) {
+            currentDoc._id = shortid.generate();
+          }
           if (isNew) {
-            
-            await handleSave(currentDoc)
-            modifydocument(newDocument())
+            let nextdocno = '';
+            let dbdocno = getDocNo(currentcmpn, doctype, docnoprefix, "");
+
+            if (parseFloat(currentDoc.docno) + 1 >= parseFloat(dbdocno)) {
+              nextdocno = (parseFloat(currentDoc.docno) + 1).toString()
+            }
+            else {
+              nextdocno = dbdocno
+            }
+            await saveDocument(currentDoc)
+
+            // getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' }).then(recommendations => {
+            //   addrecommendations(recommendations)
+            // }).catch(err => { console.log(err) })
           }
           else {
-            let retdoc:any=await handleSave(currentDoc)
-            modifydocument({...retdoc.saveRecommendation})
+            await saveDocument(currentDoc)
+            modifydocument(currentDoc)
+            // getrecommendations1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
+            //   .then(recommendations => {
+            //     addrecommendations(recommendations)
+            //   })
+            //   .catch(err => { console.log(err) })
           }
           docstatus.snackbaropen = true;
           docstatus.snackbarseverity = 'success';
           docstatus.snackbartext = doctypetext + ' Saved';
           setDocumentstatus(docstatus);
+
         }
         break;
     }
+
+
+
+
+
+
   }
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   if(redirect){
     let redirectpath='/Recommendations'
-    return <Redirect push to={redirectpath} />;   
+    return <Redirect push to={redirectpath} />;
+
+     
   }else
   return (
     <>
     <div className="container">
       <div className="grid">
         <div className="row">
-          {/* <FlatInput wd="3" label="Name" name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} /> */}
-          <SearchSelectInput wd="3" label="" options={Option} name="name1" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
+          <FlatInput wd="3" label="Name" name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
           <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} />
           <FlatInput wd="3" label="Current market price" name="cmp" currdoc={currentdocument} section={'cmp'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
-
-          {/* <div className={"col-3"}>
-            <Select options={Option} onChange={(a)=>{console.log(a)}} isClearable={true}/>
-            </div> */}
         </div>
         <div className="row">
         <FlatInput wd="3" label="Add Up To" name="addupto" currdoc={currentdocument} section={'addupto'} modifydoc={modifydocument} />
@@ -407,4 +437,40 @@ export const RecommendationComponent = (props: any) => {
     </>
   )
 }
-export default withRouter(RecommendationComponent)
+
+const mapStateToProps = (state: any) => {
+  const recdoc = state?.documents?.documents?.filter((document:any) => document.doctype==doctypes.RECOMMENDATION )
+
+  return({
+  recommendations:recdoc,
+  currentcmpn:state.documents.currentcmpn,
+  docnos:state.documents.docnos,
+  companies:state.documents.companies,
+  //transactionconfig:state.configs.configs[state.documents.currentcmpn][doctypes.INV001],
+})}
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+            
+    deleteDocument: (document:any,callback:any) => {dispatch(deleteDocument(document));   
+      if(callback && typeof callback === "function") {
+  callback();
+  }},
+  
+  
+    saveDocument:(document:any,callback:any) => {dispatch(saveDocument(document)); 
+      if(callback && typeof callback === "function") {
+        callback();
+    } },
+
+
+//     addrecommendations: (recommendations:any,callback:any) => { dispatch(addrecommendations(recommendations));   
+//     if(callback && typeof callback === "function") {
+// callback();
+// }}
+
+  
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RecommendationComponent))

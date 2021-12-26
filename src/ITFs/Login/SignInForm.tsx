@@ -5,12 +5,15 @@ import {connect} from 'react-redux'
 import {ActionToDispatch,ActionToRedirect,handleSignInJWT, checkCurrentUsernameJWT} from '../Redux/reducers/actions'
 import {displaySubmitError, runCheck,requiredCheck,maxLength128,minLength2} from '../common/validationlib';
 import {checkTouched,nvl,checkItem,isCheckedbool,getDocumenForSave} from '../common/CommonLogic';
+import ReCAPTCHA from "react-google-recaptcha";
 const initobj = {
   applicationid : "15001500", client: "45004500" ,  lang: "EN",
   username: '',
   password: '',
   validatemode:'touch'
 }
+
+
 export const handleSaveCheck=(currentdocument:any)=>{
 const {touched,username,password,validatemode} = currentdocument ; 
 currentdocument.formValid=true
@@ -37,6 +40,7 @@ currentdocument.formValid=true
 }
 export function SignInForm(props:any) {
   const [user, setUser] = useState(initobj)
+  const [captcha ,setCaptcha] = useState(false)
   const [state, setState] = useState(({}))
   function updateUser(doc:any) {
     handleClearErrors();
@@ -130,13 +134,21 @@ export function SignInForm(props:any) {
       
     } 
 
+    const onCaptchaChange = (value:any) => {
+      setCaptcha(value);
+ 
+    }
+
+
     handleSaveCheck(user)
-  return (
+   return (
     <div className="form sign-in-form">
       <h2 className="title">Sign In</h2>
       <M_LeftIconRoundInput  modifydoc={M_updateUser} iconClass="fas fa-user" name="username" placeholder="Username" currdoc={user} section={"username"} label="user name" wd={"12"}/>
       <M_LeftIconRoundInput  modifydoc={M_updateUser} iconClass="fas fa-lock" name="password" placeholder="Password" currdoc={user} section={"password"} label="user name" wd={"12"}/>
-      <input type="button" value="Login" className="btn solid" onClick={()=>{handleSubmit(user)}} />
+     
+      <ReCAPTCHA sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" onChange={()=>{onCaptchaChange(true)}}   />
+      <input type="button" value="Login" className="btn solid" onClick={()=>{handleSubmit(user)}}  disabled = {captcha ? "" : "disabled"} />
       <div  className="field-error">{state.formErrorMessage}</div>
       <M_SocialMediaLogin label="Login" />
       
