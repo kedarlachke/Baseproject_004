@@ -96,25 +96,4 @@ export const handleSave = async (currentdocument: any) => {
     
   }
 
-  export async function getRecommendationsItems() {
-    var result: any = '', errorMessage = '', errors = new Array();
-    try {
-      result = await execGql('query', recommendationItems, null)
-      if (!result) {
-        console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
-        return [];
-        // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
-      }
-      else {
-        //return result.data;
-        return result.data.recommendations;
-      }
-    }
-    catch (err:any) {
-      errors = err.errorsGql;
-      errorMessage = err.errorMessageGql;
-      console.log({ "errors": errors, "errorMessage": errorMessage })
-      // return callback({"errors":errors,"errorMessage":errorMessage},'' );
-    }
-    
-  }
+  

@@ -238,8 +238,8 @@ console.log(gqlTypeName,gqlVariables)
              client.mutate({mutation : gqlTypeName, variables:gqlVariables})
             .then(result => {  
               
-           //   console.log('execGql-result');
-          //    console.log(result);
+              console.log('execGql-result');
+              console.log(result);
               resolve(result) } )
              .catch(err=>{ 
               console.log('execGql-err');

@@ -21,7 +21,7 @@ interface Iinput {
   
 }
 export function SearchSelect(props: any) {
-  const { wd, label, options, name, section,currdoc,modifydoc,cal} = props
+  const { wd, label, options, name, section,currdoc,modifydoc,cal,refresh} = props
   const errorMsg = getErrorValueN(currdoc, 'errorsAll.' + section)
   let selectclassname = 'input-field'
   if (errorMsg !== null) {
@@ -30,7 +30,6 @@ export function SearchSelect(props: any) {
     }
   }
   let yz=getValue(currdoc,section)
-  console.log("options------->",options)
   return (<>
   <div className={`col-${wd}`}>
     <Select  
@@ -38,24 +37,10 @@ export function SearchSelect(props: any) {
           onChange={(value:any)=>{ console.log(value); setCalValue(currdoc,section,value.value,modifydoc,cal)  } } 
           //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}
           options={options}
-          />
+          /><span><i className="las la-clipboard-list" onClick={()=>{refresh()}}/></span>
           <div className="field-error">{errorMsg}</div>
           </div>
-    {/* <div className={`col-${wd}`}>
-      <div className={selectclassname}>
-        <Select  
-          value={{  value: yz,  label: yz}} 
-          onChange={(value:any)=>{ console.log(value); setCalValue(currdoc,section,value.value,modifydoc,cal)  } } 
-          //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}
-          options={options}
-          />
-          
-        <label className="label-name">
-          <span className="content-name">{label}</span>
-        </label>
-      </div>
-      <div className="field-error">{errorMsg}</div>
-    </div> */}
+  
     </>
   )
 }
