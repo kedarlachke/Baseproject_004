@@ -1,12 +1,12 @@
-import  { useState,useEffect } from 'react'
+import  { useState,useEffect } from 'react' 
 import DatePicker from '../common/DatePicker/DatePicker'
 import { FlatInput } from '../common/InputFields/Input/Input'
 import { SelectInput } from '../common/InputFields/Select/Select'
 import { SearchSelectInput } from '../common/InputFields/Select/SearchSelect'
 import * as doctypes from '../common/Doctypes';
 import { getDocs, getDocconfig, getLblVal, checkTouched, nvl, checkItem, isCheckedbool, getDocumenForSave } from '../common/CommonLogic';
-import shortid from 'shortid'
-import {handleDelete, getRecommendations,handleSave,getRecommendationsItems} from './CrudRecommendation'
+import useSaveAction from '../Hooks/useSaveAction'
+import {handleDelete, getRecommendations,handleSave} from './CrudRecommendation'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
 import {runCheck,requiredCheck,getDtFormat,getTimeFormat,getFromToDate,getDateYYYYMMDDHHMI,getDateYYYYMMDD,maxLength40,maxLength128,
@@ -59,17 +59,11 @@ export const handleSaveCheck = (currentdocument:any) => {
 const timeframeoptions = [{ 'key': '3-6', 'value': '3-6 mth' }, { 'key': '6-9', 'value': '6-9 mth' }, { 'key': '9-12', 'value': '9-12 mth' }]
 
 export const RecommendationComponent = (props: any) => {
-  const [currentdocument, modifydocument] = useState({})
-  const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
-  const [redirect, goBack] = useState(false)
+  
   const doctype= doctypes.RECOMMENDATION;
   const doctypetext= 'Recommendation';
-
-  const closeSnackBar=()=>{
-    let docstatus={...documentstatus}
-      docstatus.snackbaropen=false;
-    setDocumentstatus(docstatus)
-  }
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
+  
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
        if(_id!='NO-ID'){
@@ -79,93 +73,7 @@ export const RecommendationComponent = (props: any) => {
         }
         if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}        
     }, [])
-  const setDocumentAction = async (action: string) => {
-    let currentDoc:any = { ...currentdocument }
-    currentDoc.doctype = doctypes.RECOMMENDATION;
-    currentDoc.doctypetext="Recommendation"
-    const { doctypetext, docnoprefix, doctype } = currentDoc;
-    let action_type = '';
-    let isNew = false;
-    if (action == 'save_new') {
-      action_type = 'save';
-      isNew = true;
-    }
-    else {
-      action_type = action
-    }
-    let docstatus = {...documentstatus}
-    switch (action_type) {
-      case 'delete':
-        docstatus = {...documentstatus}
-        docstatus.action= true;
-        docstatus.dailogtitle= doctypetext + ' Deletion';
-        docstatus.dailogtext= 'Delete ' + doctypetext + '?'
-        docstatus.yesaction= async () => {
-          await handleDelete(currentDoc._id)
-          modifydocument(newDocument(doctype,doctypetext))
-            docstatus.action= false;
-            docstatus.snackbaropen=true;
-            docstatus.snackbarseverity='success';
-            docstatus.snackbartext= doctypetext + ' Deleted'
-            setDocumentstatus({...docstatus})
-        }
-          docstatus.noaction= () => {
-          docstatus.action = false;
-          setDocumentstatus({...docstatus})
-        }
-        setDocumentstatus(docstatus);
-        break;
-      case 'clear':
-        docstatus = {...documentstatus}
-        docstatus.action= true,
-        docstatus.dailogtitle= ' Clear ' + doctypetext,
-        docstatus.dailogtext = 'Clear un-saved  ' + doctypetext + '?',
-        docstatus.yesaction = () => {
-            modifydocument(newDocument(doctype,doctypetext))
-            docstatus.action= false
-            docstatus.snackbaropen= true
-            docstatus.snackbarseverity= 'success',
-            docstatus.snackbartext= doctypetext + ' Cleared'
-            setDocumentstatus(docstatus);
-          },
-          docstatus.noaction= () => {
-            docstatus.action= false
-            setDocumentstatus(docstatus);
-          }
-          setDocumentstatus(docstatus);        
-        break;
-
-      case 'save':
-        currentDoc.validatemode = 'save';
-        currentDoc = handleSaveCheck(currentDoc);
-        let isSaveOk = !Object.keys(currentDoc.errorsAll).some((x: any) => currentDoc.errorsAll[x]);
-        currentDoc = getDocumenForSave(currentDoc)
-        if (!isSaveOk) {
-          modifydocument({...currentDoc})
-          docstatus.snackbaropen = true
-          docstatus.snackbarseverity = 'error'
-          docstatus.snackbartext = 'Errors found'
-          setDocumentstatus(docstatus);
-        }
-        else {
-           if ( currentDoc.t_id ||currentDoc.t_id === '') {
-             currentDoc.t_id = shortid.generate();
-           }
-          if (isNew){           
-            await handleSave(currentDoc)
-            modifydocument(newDocument(doctype,doctypetext))
-          }else {
-            let retdoc:any=await handleSave(currentDoc)
-            modifydocument({...retdoc.saveRecommendation})
-          }
-          docstatus.snackbaropen = true;
-          docstatus.snackbarseverity = 'success';
-          docstatus.snackbartext = doctypetext + ' Saved';
-          setDocumentstatus(docstatus);
-        }
-        break;
-    }
-  }
+    
   fetch=()=>{
     alert('fetch')
   }

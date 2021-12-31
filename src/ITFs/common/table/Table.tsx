@@ -77,19 +77,19 @@ function Table(props: any) {
                         <div className="table-response">
                             <table width="100%">
                                 <thead>
-                                    <tr>{props.children.map((ele: any) => (<ColumnHead selectColumn={sortSelectedColumn} fieldname={ele.props.fieldname} selectedcolumn={selectedColumn} width={ele.props.width}>{ele.props.columnname}</ColumnHead>))}
+                                    <tr>{props.children.map((ele: any,i:any) => (<ColumnHead selectColumn={sortSelectedColumn} key={i+"_"+ele.props.fieldname} fieldname={ele.props.fieldname} selectedcolumn={selectedColumn} width={ele.props.width}>{ele.props.columnname}</ColumnHead>))}
                                             {actions?.length>0 ?<ColumnHead width={actionColWidth} selectColumn={()=>{}}>Action</ColumnHead>:null}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pageData?.map((data: any) => { 
-                                    return (<tr>{props.children.map((ele: any) => {
+                                    {pageData?.map((data: any,i:any) => { 
+                                    return (<tr key={"#"+i}>{props.children.map((ele: any,j:any) => {
                                         const { fieldname, columnname,render,width } = ele.props
                                        
-                                        return <Column data={data && data[fieldname]? data[fieldname]:""} />
+                                        return <Column key={j+"#"+fieldname} data={data && data[fieldname]? data[fieldname]:""} />
                                     })}
-                                    {<Column data={<div className="table-button-container">{actions.map((action:any,i:any)=>{
-                                        return(<SMIconButton action={action.action} id={data && data["_id"]? data["_id"]:""} icon={action.icon} className={action.className}/>)})}</div>}/>
+                                    {<Column data={<div className="table-button-container">{actions.map((action:any,k:any)=>{
+                                        return(<SMIconButton key={k+"#"+action.icon} action={action.action} id={data && data["_id"]? data["_id"]:""} icon={action.icon} className={action.className}/>)})}</div>}/>
                                     }
                                     </tr>)})
                                 
@@ -103,6 +103,7 @@ function Table(props: any) {
                     activePage={activePage} setActivePage={setActivePage} 
                     numberOfRecordsPerPage={numberOfRecordsPerPage}
                     setNumberOfRecordsPerPage={setNumberOfRecordsPerPage}
+                    total={filterdata.length}
                 />
             
         </>

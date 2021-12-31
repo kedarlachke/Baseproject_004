@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './datepicker.css'
 import { FlatInput } from '../InputFields/Input/Input'
+import shortid from 'shortid'
 import {
   setValue, getValue, getErrorValue, getErrorValueN, setCalValue,
   getDtFormat,
@@ -114,7 +115,7 @@ function DatePicker(props: any) {
     const temp = getDay(0, displayDate)
     for (let i = 0; i < temp; i++) {
       arr.push(
-        <div className="day">
+        <div className="day" key={i+"_#"+shortid.generate()}>
           <span>{days[i]}</span>&nbsp;
         </div>
       )
@@ -131,7 +132,7 @@ function DatePicker(props: any) {
             SelectedDate.year === displayDate.year
         )
         arr.push(
-          <div className="day selected">
+          <div className="day selected" key={shortid.generate()}>
             <span className="selected">{days[getDay(i, displayDate)]}</span>
             {i + 1}
           </div>
@@ -139,6 +140,7 @@ function DatePicker(props: any) {
       } else
         arr.push(
           <div
+          key={shortid.generate()}
             className="day"
             onClick={() =>
               setSelectedDate({
@@ -174,19 +176,19 @@ function DatePicker(props: any) {
 <FlatInput wd="12" label={label} name={label} currdoc={currdoc} section={section} modifydoc={modifydoc} />
     <div className="field-error">{errorMsg}</div>
       <div className={toggle ? 'dates active' : 'dates'}>
-        <div className="month">
+        <div className="month" key={shortid.generate()}>
           <div className="arrows prev-mth" onClick={goToPrevMonth}>
             &lt;
           </div>
-          <div className="mth" onClick={() => {}}>
+          <div className="mth" onClick={() => {}} key={shortid.generate()}>
             {selectedMth}
           </div>
-          <div className="arrows next-mth" onClick={goToNextMonth}>
+          <div className="arrows next-mth" onClick={goToNextMonth} key={shortid.generate()}>
             &gt;
           </div>
         </div>
 
-        <div className="days" onClick={() => {}}>
+        <div className="days" onClick={() => {}} key={shortid.generate()}>
           {populateDays()}
         </div>
         <div className="date-button-container">

@@ -173,3 +173,10 @@ color:var(--secondary-color);
     font-weight: 400;
     letter-spacing: 2px;
 }
+
+.pagination-divider{
+    font-size: 1.5rem;
+    font-weight: 100;
+    margin-top: -5px;
+    padding: 0px 10px 0px 10px;
+}

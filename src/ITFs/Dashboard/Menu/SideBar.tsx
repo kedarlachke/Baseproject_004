@@ -123,7 +123,7 @@ export function SideBar1(props: any) {
         {/* <ui> */}
         {menuList.map((menuitem, i) => {
           return (
-            <M_MenuItem
+            <M_MenuItem key={i+"_"+menuitem.name}
               menuname={menuitem.name}
               iconname={menuitem.iconName}
               active={activeMenu === menuitem.name ? 'active' : ''}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './table.css'
 function Pagination_N(props: any) {
-    const { number ,setActivePage,activePage,setNumberOfRecordsPerPage,numberOfRecordsPerPage} = props;
+    const { number ,setActivePage,activePage,setNumberOfRecordsPerPage,numberOfRecordsPerPage,total} = props;
     const [input, setInput] = useState("1")
     const arr = []
     const onChange = (e: any) => {
@@ -35,7 +35,7 @@ function Pagination_N(props: any) {
         
         
         <div className="pagination">
-          <div className="page-of">Page {activePage} of {number}</div>  
+          <div className="page-of">Page {activePage} of {number} <span className='pagination-divider'> | </span> Total {total}</div>  
        <div className="pageination-section">
         <button className="pagination-btn" onClick={()=>changePage("1")}>{"<<"}</button>
         <button className="pagination-btn" onClick={()=>{activePage!==1?changePage((activePage-1)+""):''}}>{"<"}</button>
