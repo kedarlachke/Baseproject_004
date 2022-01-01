@@ -1,10 +1,9 @@
 import {useState} from 'react'
-import shortid from 'shortid'
 import { getDocumenForSave } from '../common/CommonLogic';
 import {initDocumentstatus,newDocument} from '../common/constant'
 
-function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doctype:String,doctypetext:String
-    ) {
+function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doctype:String,doctypetext:String,
+  resetFocus:any ) {
         const [currentdocument, modifydocument] = useState({})
   const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
   const [redirect, goBack] = useState(false)
@@ -50,6 +49,7 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
               setDocumentstatus({...docstatus})
             }
             setDocumentstatus(docstatus);
+            resetFocus()
             break;
           case 'clear':
             docstatus = {...documentstatus}
@@ -63,12 +63,14 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
                 docstatus.snackbarseverity= 'success',
                 docstatus.snackbartext= doctypetext + ' Cleared'
                 setDocumentstatus(docstatus);
+               
               },
               docstatus.noaction= () => {
                 docstatus.action= false
                 setDocumentstatus(docstatus);
               }
-              setDocumentstatus(docstatus);        
+              setDocumentstatus(docstatus);  
+              resetFocus()      
             break;
     
           case 'save':
@@ -84,21 +86,20 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
               setDocumentstatus(docstatus);
             }
             else {
-               if ( currentDoc.t_id ||currentDoc.t_id === '') {
-                 currentDoc.t_id = shortid.generate();
-               }
               if (isNew){           
                 await handleSave(currentDoc)
                 modifydocument(newDocument(doctype,doctypetext))
               }else {
                 let retdoc:any=await handleSave(currentDoc)
                 modifydocument({...retdoc["save"+doctypetext]})
+                
               }
               docstatus.snackbaropen = true;
               docstatus.snackbarseverity = 'success';
               docstatus.snackbartext = doctypetext + ' Saved';
               setDocumentstatus(docstatus);
             }
+            resetFocus();
             break;
         }
       }

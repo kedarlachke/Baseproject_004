@@ -1,3 +1,5 @@
+import shortid from 'shortid'
+
 export default {
     applicationid: '15001500',
       client: '45004500',
@@ -9,7 +11,9 @@ export const newDocument = (doctype:String,doctypetext:String) => {
     doctype,
     doctypetext,
     status: 'active',
-    validatemode: 'touch'
+    validatemode: 'touch',
+    t_id: shortid.generate()
+    
   }
 };
 

@@ -21,7 +21,7 @@ interface Iinput {
   
 }
 export function SearchSelect(props: any) {
-  const { wd, label, options, name, section,currdoc,modifydoc,cal,refresh} = props
+  const { wd, label, options, name, section,currdoc,modifydoc,cal,refresh,inpref} = props
   const errorMsg = getErrorValueN(currdoc, 'errorsAll.' + section)
   let selectclassname = 'input-field'
   if (errorMsg !== null) {
@@ -33,6 +33,8 @@ export function SearchSelect(props: any) {
   return (<>
   <div className={`col-${wd}`}>
     <Select  
+    name={name}
+    ref={inpref}
           value={{  value: yz,  label: yz}} 
           onChange={(value:any)=>{value?.value.length>2 ? setCalValue(currdoc,section,value?.value,modifydoc,cal):""  } } 
           //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}

@@ -82,7 +82,8 @@ function DatePicker(props: any) {
       } else {
         month = month + 1
       }
-
+     if(format==="yyyymmdd")
+        return date.year+""+month+""+day 
       return day + '/' + month + '/' + date.year
     }
     return ''
@@ -158,7 +159,7 @@ function DatePicker(props: any) {
     return arr
   }
   
-  const { wd, label, name, section, currdoc,modifydoc,cal } = props
+  const { wd, label, name, section, currdoc,modifydoc,cal,format} = props
   let classname = 'input-field'
   const errorMsg = getErrorValueN(currdoc, 'errorsAll.' + section)
   if (errorMsg !== null) {
@@ -174,7 +175,7 @@ function DatePicker(props: any) {
       {/* <div className="selected-date">{formatDate(finalDate,"")}</div> */}
 
 <FlatInput wd="12" label={label} name={label} currdoc={currdoc} section={section} modifydoc={modifydoc} />
-    <div className="field-error">{errorMsg}</div>
+    
       <div className={toggle ? 'dates active' : 'dates'}>
         <div className="month" key={shortid.generate()}>
           <div className="arrows prev-mth" onClick={goToPrevMonth}>
@@ -207,7 +208,7 @@ function DatePicker(props: any) {
             className="date-ok-button"
             onClick={() => {
               toggleDatePicker(); setFinalDate({ ...SelectedDate });
-              setCalValue(currdoc, section, formatDate({ ...SelectedDate }, ''), modifydoc, cal)
+              setCalValue(currdoc, section, formatDate({ ...SelectedDate }, format), modifydoc, cal)
             }}
           >
             OK

@@ -1,4 +1,4 @@
-import  { useState,useEffect,useMemo,useCallback } from 'react' 
+import  { useState,useEffect,useMemo,useRef } from 'react' 
 import DatePicker from '../common/DatePicker/DatePicker'
 import { FlatInput } from '../common/InputFields/Input/Input'
 import { SelectInput } from '../common/InputFields/Select/Select'
@@ -57,20 +57,27 @@ export const handleSaveCheck = (currentdocument:any) => {
       timeframe: checkTouched(nvl(touched.repeatpassword, false), timeframe_check),
     }
   }
+  
+  
   return currentdocument;
 }
 
 const timeframeoptions = [{ 'key': '3-6', 'value': '3-6 mth' }, { 'key': '6-9', 'value': '6-9 mth' }, { 'key': '9-12', 'value': '9-12 mth' }]
 
 export const RecommendationComponent = (props: any) => {
-  
+  const compinp:any=useRef(0)
   const doctype= doctypes.RECOMMENDATION;
   const doctypetext= 'Recommendation';
-  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
+  const resetFocus =()=>{
+    setTimeout(()=>compinp.current.focus(),1000)
+   }
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
   const [stocklist, setstocklist] = useState([])
   const [loaderDisplay, setloaderDisplay] = useState(false)
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
+      compinp.current.focus()
+      console.log("00000000->>>>>>>",compinp.current)
        if(_id!='NO-ID'){
            getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN', _id}).then((data:any)=>{ 
                 modifydocument(data[0])
@@ -95,7 +102,7 @@ export const RecommendationComponent = (props: any) => {
     <div className="container">
       <div className="grid">
       <div className="row">
-      <button onClick={ ()=>{setloaderDisplay(true);
+      <button onClick={ ()=>{setloaderDisplay(true);compinp.current.focus()
       fetchStocks({},
 
 (err:any,result:any):any=> {
@@ -106,8 +113,8 @@ export const RecommendationComponent = (props: any) => {
 </button>
         </div>
         <div className="row">
-        <SearchSelectInput wd="3" label="" options={M_stocklist} name="name1" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
-          <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} />
+        <SearchSelectInput inpref={compinp} wd="3" label="" options={M_stocklist} name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
+          <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} format="yyyymmdd"/>
           <FlatInput wd="3" label="Current market price" name="cmp" currdoc={currentdocument} section={'cmp'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
         </div>
@@ -144,7 +151,7 @@ export const RecommendationComponent = (props: any) => {
       <AlertDialog open={action}  handleno={noaction} handleyes={yesaction} dailogtext={dailogtext} dailogtitle={dailogtitle}/>           
       <Messagesnackbar snackbaropen={documentstatus.snackbaropen} snackbarseverity={documentstatus.snackbarseverity} handlesnackbarclose={closeSnackBar} snackbartext={documentstatus.snackbartext}/>                    
     </div>
-    <AppbarBottom setAction={setDocumentAction} handleGoback={goBack}/>
+    <AppbarBottom setAction={setDocumentAction} handleGoback={goBack} setfocus={resetFocus}/>
     </>
   )
 }
