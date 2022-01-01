@@ -18,6 +18,7 @@ import {initDocumentstatus,newDocument} from '../common/constant'
 import {fetchStocks,addstocks} from '../Redux/ActionCreators'
 import { connect } from 'react-redux';
 import  * as ActionTypes from '../Redux/ActionTypes'
+import Loader from '../common/Loader/Loader'
 
 export const handleSaveCheck = (currentdocument:any) => {
   const { touched, name, recodate, cmp, addupto, sl,target1,target2,weightage,timeframe,validatemode } = currentdocument;
@@ -67,6 +68,7 @@ export const RecommendationComponent = (props: any) => {
   const doctypetext= 'Recommendation';
   const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
   const [stocklist, setstocklist] = useState([])
+  const [loaderDisplay, setloaderDisplay] = useState(false)
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
        if(_id!='NO-ID'){
@@ -89,13 +91,15 @@ export const RecommendationComponent = (props: any) => {
   }else
   return (
     <>
+    <Loader display={loaderDisplay}/>
     <div className="container">
       <div className="grid">
       <div className="row">
-      <button onClick={ ()=>{fetchStocks({},
+      <button onClick={ ()=>{setloaderDisplay(true);
+      fetchStocks({},
 
 (err:any,result:any):any=> {
-              if(err=='') {  console.log(result); props.addstocks(result)    ;  }
+              if(err=='') {  console.log(result); props.addstocks(result);setloaderDisplay(false)  }
               else   {console.log(err,result)} })}
      }>
   Get Stocks
