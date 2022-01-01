@@ -14,31 +14,15 @@ import { execGql, execGql_xx } from '../gqlclientconfig';
 import usersQuery from '../queries/usersQuery'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
+import useSaveAction from '../Hooks/useSaveAction'
 import Loader from '../common/Loader/Loader'
-import {
-  runCheck,
-  requiredCheck,
-  getDtFormat,
-  getTimeFormat,
-  getFromToDate,
-  getDateYYYYMMDDHHMI,
-  getDateYYYYMMDD,
-  maxLength40,
-  maxLength128,
-  setErrorValue,
-  getValue,
-  setValue
- } from '../common/validationlib';
- import {
-  Redirect,
-  withRouter } from 'react-router-dom'
+import {initDocumentstatus,newDocument} from '../common/constant'
+import {runCheck,requiredCheck,getDtFormat,getTimeFormat,getFromToDate,getDateYYYYMMDDHHMI,getDateYYYYMMDD,maxLength40,maxLength128,setErrorValue,getValue,setValue} from '../common/validationlib';
+ import {Redirect,withRouter } from 'react-router-dom'
 import AppbarBottom from '../common/AppBarBottom/AppbarBottom'
-
-
 const usexoptions = [{ 'key': 'M', 'value': 'Male' }, { 'key': 'F', 'value': 'Female' }, { 'key': 'NTD', 'value': 'Not disclosed' }]
 const countryoptions = [{ 'key': 'IN', 'value': 'India' }, { 'key': 'GE', 'value': 'Germany' }, { 'key': 'US', 'value': 'USA' }]
-
-const handleSaveuser = async (currentdocument: any) => {
+const handleSave = async (currentdocument: any) => {
   var result: any = '', errorMessage = '', errors = new Array();
   try {
     let userForSave = {
@@ -71,8 +55,7 @@ const handleSaveuser = async (currentdocument: any) => {
     return result.data;
   }
 }
-
-const handleDeleteuser = async (_id: string) => {
+const handleDelete = async (_id: string) => {
   var result: any = '', errorMessage = '', errors = new Array();
   try {
     result = await execGql('mutation', deleteUser, { _id })
@@ -92,40 +75,6 @@ const handleDeleteuser = async (_id: string) => {
   }
   
 }
-
-const getDocNo = (currentcmpn: any, doctype: string, docnoprefix: string, docnos: any) => {
-  var docno = '1';
-  var i;
-  if (docnos != null) {
-    for (i = 0; i < docnos.length; i++) {
-      if (docnos[i].cmpn == currentcmpn && docnos[i].doctype == doctype && docnos[i].docnoprefix == docnoprefix) {
-        docno = docnos[i].docno;
-        docno = (parseInt(docno) + 1).toString();
-      }
-    }
-  }
-  return docno;
-}
-
-const newDocument = (cmpn: any, docno: string) => {
-  const newdoc={...initDocumentstatus}
-  return {...newdoc,
-    cmpn: cmpn,
-    doctype: doctypes.USER,
-    doctypetext: 'User',
-    docno: docno,
-    status: 'active',
-    validatemode: 'touch'
-  }
-};
-
-
-const initcurrdoc = {
- cmpn:{}, applicationid: "15001500", client: "45004500", lang: "EN", doctype: "",
-  doctypetext: "", docnoprefix: "", _id: "", docno: "", validatemode: "", errorsAll: []
-}
-
-
 export async function getUsers1(values: any) {
   var result: any = '', errorMessage = '', errors = new Array();
   try {
@@ -149,7 +98,6 @@ export async function getUsers1(values: any) {
     return result.data.users;
   }
 }
-
 export const handleSaveCheck = (currentdocument:any, users:any) => {
   const { touched, username, firstname, password, repeatpassword, validatemode } = currentdocument;
   let isNew = false;
@@ -214,175 +162,23 @@ export const handleSaveCheck = (currentdocument:any, users:any) => {
 
   return currentdocument;
 }
-const initDocumentstatus = {
-  docconfig: {},
-  currentdocument: {},
-  action: false,
-  snackbaropen: false,
-  snackbarseverity: '',
-  handlesnackbarclose: () => { },
-  snackbartext: '',
-  yesaction: () => { },
-  noaction: () => { },
-  redirect: false,
-  goback: false,
-  dailogtitle:"",
-  dailogtext:""
-}
 export const UserComponent = (props: any) => {
-  const [currentdocument, modifydocument] = useState({})
-  const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
-  const [redirect, goBack] = useState(false)
-  const closeSnackBar=()=>{
-    let docstatus={...documentstatus}
-      docstatus.snackbaropen=false;
-    setDocumentstatus(docstatus)
-  }
+  const doctype= doctypes.USER;
+  const doctypetext= 'Username';
      useEffect(() => {
-      const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
       let _id=new URLSearchParams(props.location.search).get("_id")
-
        if(_id!='NO-ID')
         {
-            const curdoc= props.users.find((document:any)=>document._id==_id)
+         const curdoc= props.users.find((document:any)=>document._id==_id)
          modifydocument(curdoc)
         }
-
-        if(_id=='NO-ID')
-        {   
-            let docno= getDocNo(currentcmpn,doctypes.USER,'',docnos)
-            modifydocument(newDocument(currentcmpn,docno))
+        if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}
+        return () => {      
         }
-         
-        return () => {
-            
-        }
-    }, [props._id])
-  const setDocumentAction = async (action: string) => {
-    const { currentcmpn, deleteDocument, saveDocument, docnos, users, addusers } = props;
-    let currentDoc:any = { ...currentdocument }
-    currentDoc.doctype = doctypes.USER;
-    currentDoc.doctypetext="User"
-    const { doctypetext, docnoprefix, doctype } = currentDoc;
-    let action_type = '';
+    }, [])
+    const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
 
-    let isNew = false;
-    if (action == 'save_new') {
-      action_type = 'save';
-      isNew = true;
-    }
-    else {
-      action_type = action
-    }
-    let docstatus = {...documentstatus}
-    switch (action_type) {
-      case 'delete':
-        docstatus = {...documentstatus}
-        docstatus.action= true;
-        docstatus.dailogtitle= doctypetext + ' Deletion';
-        docstatus.dailogtext= 'Delete ' + doctypetext + '?'
-        docstatus.yesaction= async () => {
-          let docno = getDocNo(currentcmpn, doctype, '', docnos)
-         let a= await handleDeleteuser(currentDoc._id)
-          let newdoc:any = newDocument(currentcmpn, docno);
-          modifydocument(newdoc)
-          getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
-            .then(users => {
-              addusers(users)
-            })
-            .catch(err => { console.log(err) })
-            docstatus.action= false;
-            docstatus.snackbaropen=true;
-            docstatus.snackbarseverity='success';
-            docstatus.snackbartext= doctypetext + ' Deleted'
-
-            setDocumentstatus({...docstatus})
-        }
-        docstatus.noaction= () => {
-          docstatus.action = false;
-          setDocumentstatus({...docstatus})
-        }
-        setDocumentstatus(docstatus);
-        break;
-
-      case 'clear':
-        docstatus = {...documentstatus}
-        docstatus.action= true,
-        docstatus.dailogtitle= ' Clear ' + doctypetext,
-        docstatus.dailogtext = 'Clear un-saved  ' + doctypetext + '?',
-        docstatus.yesaction = () => {
-            let docno = getDocNo(currentcmpn, doctype, '', docnos)
-            let newcurdoc:any = newDocument(currentcmpn, docno)
-            modifydocument(newcurdoc)
-            docstatus.action= false
-            docstatus.snackbaropen= true
-            docstatus.snackbarseverity= 'success',
-            docstatus.snackbartext= doctypetext + ' Cleared'
-            setDocumentstatus(docstatus);
-          },
-          docstatus.noaction= () => {
-            docstatus.action= false
-            setDocumentstatus(docstatus);
-          }
-          setDocumentstatus(docstatus);
-        
-        break;
-
-      case 'save':
-        currentDoc.validatemode = 'save';
-        currentDoc = handleSaveCheck(currentDoc, users);
-        let isSaveOk = !Object.keys(currentDoc.errorsAll).some((x: any) => currentDoc.errorsAll[x]);
-        currentDoc = getDocumenForSave(currentDoc)
-        if (!isSaveOk) {
-          modifydocument(currentDoc)
-          docstatus.snackbaropen = true
-          docstatus.snackbarseverity = 'error'
-          docstatus.snackbartext = 'Errors found'
-          setDocumentstatus(docstatus);
-        }
-        else {
-          if (currentDoc._id == '' || currentDoc._id == null) {
-            currentDoc._id = shortid.generate();
-          }
-          if (isNew) {
-            let nextdocno = '';
-            let dbdocno = getDocNo(currentcmpn, doctype, docnoprefix, "");
-
-            if (parseFloat(currentDoc.docno) + 1 >= parseFloat(dbdocno)) {
-              nextdocno = (parseFloat(currentDoc.docno) + 1).toString()
-            }
-            else {
-              nextdocno = dbdocno
-            }
-            await handleSaveuser(currentDoc)
-            modifydocument(currentDoc)
-            getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' }).then(users => {
-              addusers(users)
-            }).catch(err => { console.log(err) })
-          }
-          else {
-            let retdoc=await handleSaveuser(currentDoc)
-            modifydocument({...retdoc.saveUsername})
-            getUsers1({ applicationid: '15001500', client: '45004500', lang: 'EN' })
-              .then(users => {
-                addusers(users)
-              })
-              .catch(err => { console.log(err) })
-          }
-          docstatus.snackbaropen = true;
-          docstatus.snackbarseverity = 'success';
-          docstatus.snackbartext = doctypetext + ' Saved';
-          setDocumentstatus(docstatus);
-        }
-        break;
-    }
-
-
-
-
-
-
-  }
+  
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   if(redirect){
     let redirectpath='/Users'
@@ -428,55 +224,10 @@ export const UserComponent = (props: any) => {
           <SelectInput wd="3" label="Country" options={countryoptions} name="country" currdoc={currentdocument} section={'country'} modifydoc={modifydocument} />
 
         </div>
-        {/* <div className="row"><Button
-          wd="2"
-          label="Clear"
-          name="register"
-          className="btn-deault btn-small"
-        />
-        <Button
-          wd="2"
-          label="Back"
-          name="back"
-          className="btn-deault btn-small"
-          onClick={()=>goBack(true)}
-        />
-          <Button
-            wd="2"
-            label="Delete"
-            name="delete"
-            className="btn1 btn-small"
-           onClick={()=>setDocumentAction('delete')}
-           />
-          <Button
-            wd="2"
-            label="Register"
-            name="register"
-            className="btn1 btn-small"
-           onClick={setDocumentAction}
-           
-          />
-          </div> */}
           
       </div>
- <AlertDialog 
-                    open={action}  
-                    handleno={noaction}
-                    handleyes={yesaction}
-                    dailogtext={dailogtext}
-                    dailogtitle={dailogtitle}
-
-                    /> 
-                
-
-
-                    <Messagesnackbar 
-                     snackbaropen={documentstatus.snackbaropen}
-                     snackbarseverity={documentstatus.snackbarseverity}
-                     handlesnackbarclose={closeSnackBar}
-                     snackbartext={documentstatus.snackbartext}
-                    />
-                    
+    <AlertDialog open={action} handleno={noaction} handleyes={yesaction} dailogtext={dailogtext} dailogtitle={dailogtitle} /> 
+    <Messagesnackbar snackbaropen={documentstatus.snackbaropen} snackbarseverity={documentstatus.snackbarseverity} handlesnackbarclose={closeSnackBar} snackbartext={documentstatus.snackbartext}/>                
     </div>
     <AppbarBottom setAction={setDocumentAction} handleGoback={goBack}/>
     </>

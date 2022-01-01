@@ -8,6 +8,7 @@ export const newDocument = (doctype:String,doctypetext:String) => {
   return {
     doctype,
     doctypetext,
+    status: 'active',
     validatemode: 'touch'
   }
 };

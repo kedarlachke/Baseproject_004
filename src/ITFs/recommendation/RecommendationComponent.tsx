@@ -1,4 +1,4 @@
-import  { useState,useEffect } from 'react' 
+import  { useState,useEffect,useMemo,useCallback } from 'react' 
 import DatePicker from '../common/DatePicker/DatePicker'
 import { FlatInput } from '../common/InputFields/Input/Input'
 import { SelectInput } from '../common/InputFields/Select/Select'
@@ -15,6 +15,9 @@ import {runCheck,requiredCheck,getDtFormat,getTimeFormat,getFromToDate,getDateYY
 import AppbarBottom from '../common/AppBarBottom/AppbarBottom'
 import Option  from './arrNames'
 import {initDocumentstatus,newDocument} from '../common/constant'
+import {fetchStocks,addstocks} from '../Redux/ActionCreators'
+import { connect } from 'react-redux';
+import  * as ActionTypes from '../Redux/ActionTypes'
 
 export const handleSaveCheck = (currentdocument:any) => {
   const { touched, name, recodate, cmp, addupto, sl,target1,target2,weightage,timeframe,validatemode } = currentdocument;
@@ -63,7 +66,7 @@ export const RecommendationComponent = (props: any) => {
   const doctype= doctypes.RECOMMENDATION;
   const doctypetext= 'Recommendation';
   const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
-  
+  const [stocklist, setstocklist] = useState([])
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
        if(_id!='NO-ID'){
@@ -74,10 +77,12 @@ export const RecommendationComponent = (props: any) => {
         if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}        
     }, [])
     
-  fetch=()=>{
-    alert('fetch')
-  }
+ 
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
+  if(stocklist && props?.stocks && stocklist?.length !== props?.stocks?.length){
+    setstocklist(props.stocks.map((el:any) => { return { value: el.name,  label: el.name}}));  
+    }
+    const M_stocklist =useMemo(() => stocklist, [stocklist])
   if(redirect){
     let redirectpath='/Recommendations'
     return <Redirect push to={redirectpath} />;   
@@ -86,8 +91,18 @@ export const RecommendationComponent = (props: any) => {
     <>
     <div className="container">
       <div className="grid">
+      <div className="row">
+      <button onClick={ ()=>{fetchStocks({},
+
+(err:any,result:any):any=> {
+              if(err=='') {  console.log(result); props.addstocks(result)    ;  }
+              else   {console.log(err,result)} })}
+     }>
+  Get Stocks
+</button>
+        </div>
         <div className="row">
-          <SearchSelectInput wd="3" label="" options={Option} name="name1" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} refresh={fetch}/>
+        <SearchSelectInput wd="3" label="" options={M_stocklist} name="name1" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
           <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} />
           <FlatInput wd="3" label="Current market price" name="cmp" currdoc={currentdocument} section={'cmp'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>
@@ -129,4 +144,23 @@ export const RecommendationComponent = (props: any) => {
     </>
   )
 }
-export default withRouter(RecommendationComponent)
+
+const mapDispatchToProps = (dispatch:any) => ({
+  addstocks: (stocks:any,callback:any) => {console.log(addstocks(stocks)) ;dispatch(addstocks(stocks));   
+    if(callback && typeof callback === "function") {
+callback();
+}}
+})
+
+const mapStateToProps = (state:any) => {
+  console.log('state',state)
+  return {
+      stocks: state.stocks.stocks.stocks,
+
+  }
+}
+
+
+
+export default  withRouter(connect(mapStateToProps,mapDispatchToProps)(RecommendationComponent));
+

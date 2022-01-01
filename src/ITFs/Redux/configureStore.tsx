@@ -4,6 +4,7 @@ import thunk from 'redux-thunk';
 import {configs} from './configs'
 import {documents } from './documents';
 import {users } from './users';
+import {stocks } from './stocks';
 import {currentdocument} from './currentdocument'
 import authReducer from './reducers/auth_reducer';
 import formsReducer from './reducers/forms_reducer';
@@ -25,6 +26,7 @@ persistCombineReducers(config,{
     documents,
     auth: authReducer,
     users: users,
+    stocks:stocks,
     router: routerReducer,
     forms:formsReducer,
     configs,

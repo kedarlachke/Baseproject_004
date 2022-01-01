@@ -92,7 +92,7 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
                 modifydocument(newDocument(doctype,doctypetext))
               }else {
                 let retdoc:any=await handleSave(currentDoc)
-                modifydocument({...retdoc.saveRecommendation})
+                modifydocument({...retdoc["save"+doctypetext]})
               }
               docstatus.snackbaropen = true;
               docstatus.snackbarseverity = 'success';

@@ -34,9 +34,10 @@ export function SearchSelect(props: any) {
   <div className={`col-${wd}`}>
     <Select  
           value={{  value: yz,  label: yz}} 
-          onChange={(value:any)=>{ console.log(value); setCalValue(currdoc,section,value.value,modifydoc,cal)  } } 
+          onChange={(value:any)=>{value?.value.length>2 ? setCalValue(currdoc,section,value?.value,modifydoc,cal):""  } } 
           //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}
           options={options}
+          isClearable={true}
           /><span><i className="las la-clipboard-list" onClick={()=>{refresh()}}/></span>
           <div className="field-error">{errorMsg}</div>
           </div>
