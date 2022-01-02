@@ -32,7 +32,8 @@ export function SearchSelect(props: any) {
   let yz=getValue(currdoc,section)
   return (<>
   <div className={`col-${wd}`}>
-    <Select  
+    <div style={{display:'flex'}}>
+    <span style={{flex:11}}><Select  
     name={name}
     ref={inpref}
           value={{  value: yz,  label: yz}} 
@@ -40,7 +41,10 @@ export function SearchSelect(props: any) {
           //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}
           options={options}
           isClearable={true}
-          /><span className="las la-sync" onClick={()=>{refresh()}}/>
+          className={""}
+          /></span>
+          <span className="las la-sync" onClick={()=>{refresh()}} style={{flex:1,height:"100%",fontSize:"1.8rem",padding:"5px"}}/>
+          </div>
           <div className="field-error">{errorMsg}</div>
           </div>
   
