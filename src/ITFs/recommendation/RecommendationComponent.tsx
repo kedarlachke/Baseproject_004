@@ -77,7 +77,6 @@ export const RecommendationComponent = (props: any) => {
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
       compinp.current.focus()
-      console.log("00000000->>>>>>>",compinp.current)
        if(_id!='NO-ID'){
            getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN', _id}).then((data:any)=>{ 
                 modifydocument(data[0])
@@ -85,8 +84,15 @@ export const RecommendationComponent = (props: any) => {
         }
         if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}        
     }, [])
-    
- 
+const getStockcmp=()=>{
+  setloaderDisplay(true);compinp.current.focus()
+    fetchStocks({},
+
+(err:any,result:any):any=> {
+            if(err=='') {  console.log(result); props.addstocks(result);setloaderDisplay(false)  }
+            else   {console.log(err,result)} })
+          }
+   
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   if(stocklist && props?.stocks && stocklist?.length !== props?.stocks?.length){
     setstocklist(props.stocks.map((el:any) => { return { value: el.name,  label: el.name}}));  
@@ -101,7 +107,7 @@ export const RecommendationComponent = (props: any) => {
     <Loader display={loaderDisplay}/>
     <div className="container">
       <div className="grid">
-      <div className="row">
+      {/* <div className="row">
       <button onClick={ ()=>{setloaderDisplay(true);compinp.current.focus()
       fetchStocks({},
 
@@ -111,9 +117,9 @@ export const RecommendationComponent = (props: any) => {
      }>
   Get Stocks
 </button>
-        </div>
+        </div> */}
         <div className="row">
-        <SearchSelectInput inpref={compinp} wd="3" label="" options={M_stocklist} name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} />
+        <SearchSelectInput inpref={compinp} wd="3" label="" options={M_stocklist} name="name" currdoc={currentdocument} section={'name'} modifydoc={modifydocument} refresh={getStockcmp}/>
           <DatePicker wd="3" label="Recommendation Date"  name="recodate"  currdoc={currentdocument} section={'recodate'} modifydoc={modifydocument} format="yyyymmdd"/>
           <FlatInput wd="3" label="Current market price" name="cmp" currdoc={currentdocument} section={'cmp'} modifydoc={modifydocument} />
           <div className={"col-3"}></div>

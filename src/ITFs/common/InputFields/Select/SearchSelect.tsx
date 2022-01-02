@@ -40,7 +40,7 @@ export function SearchSelect(props: any) {
           //onBlur={event => modifydoc(setValue(currdoc,'touched.'+section,true))}
           options={options}
           isClearable={true}
-          /><span><i className="las la-clipboard-list" onClick={()=>{refresh()}}/></span>
+          /><span className="las la-sync" onClick={()=>{refresh()}}/>
           <div className="field-error">{errorMsg}</div>
           </div>
   
