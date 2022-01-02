@@ -1,7 +1,9 @@
 import React from 'react'
 import './modal.css'
+import {useKey,useAltKey} from '../shortcurkeys'
 function Modal({open,handleno,handleyes,dailogtext,dailogtitle}: any) {
-    
+    useAltKey("y",() =>{handleyes()})
+    useAltKey("n",() =>{handleno()})
     if(open){
     return (
         <>

@@ -17,6 +17,7 @@ import UserListComponent from '../User/UserListComponent'
 import RecommendationListComponent from '../recommendation/RecommendationListComponent'
 import RecommendationComponent from '../recommendation/RecommendationComponent'
 import {BrowserRouter as Rounter, Route, Switch} from 'react-router-dom'
+//import { SearchSelectInput } from '../common/InputFields/Select/SearchSelectInput'
 //import {getUsers,addusers} from '../Redux/ActionCreators'
 
 function displaySelectedComponent(displayItem: string) {
@@ -88,6 +89,7 @@ const DashboardComponent = (props: any) => {
       <div className="recent-grid">
         <Projects />
         <Customers />
+        {/* <SearchSelectInput wd="3" label="Weightage" name="weightage" currdoc={{}} section={'weightage'} modifydoc={()=>{}}/> */}
       </div>
     </>
   )

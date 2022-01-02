@@ -1,7 +1,14 @@
 import React from 'react'
 import './AppbarBottom.css'
+import {useAltKey,useKey} from '../shortcurkeys'
 function AppbarBottom(props:any) {
   const { setAction,handleGoback }=props;
+  useAltKey("c",() =>{setAction('clear')})
+  useAltKey("b",() =>{handleGoback(true)})
+  useAltKey("s",() =>{setAction('save')})
+  useAltKey("d",() =>{setAction('delete')})
+  useAltKey("x",() =>{setAction('save_new')})
+  useKey("Enter",() =>{setAction('save')})
   return (
     <div className="nav-container">
     <nav className="nav">

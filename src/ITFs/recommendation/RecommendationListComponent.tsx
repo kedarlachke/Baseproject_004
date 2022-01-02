@@ -7,6 +7,7 @@ import { Redirect, withRouter } from 'react-router-dom'
 import {addusers} from '../Redux/ActionCreators'
 import { getRecommendations } from '../Redux/reducers/actions'
 import * as doctypes from '../common/Doctypes';
+import {useAltKey,useKey} from '../common/shortcurkeys'
 export const UserListComponent = (props: any) => {
 
   const{recommendatios} = props
@@ -36,7 +37,7 @@ export const UserListComponent = (props: any) => {
   if(recommendations){
     tabledata =useMemo(() => [...recommendations], [recommendations])
 }
-
+useAltKey("n",() =>{setDocStatus("NO-ID",true)})
   if (redirect) {
     let redirectpath = '/recommendationedit?_id=' + docno
     return <Redirect push to={redirectpath} /> 
