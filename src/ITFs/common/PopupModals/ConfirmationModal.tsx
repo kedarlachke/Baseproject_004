@@ -3,7 +3,7 @@ import './modal.css'
 import {useKey,useAltKey} from '../shortcurkeys'
 function Modal({open,handleno,handleyes,dailogtext,dailogtitle}: any) {
     useAltKey("y",() =>{handleyes()})
-    useAltKey("n",() =>{handleno()})
+    useAltKey("q",() =>{handleno()})
     if(open){
     return (
         <>

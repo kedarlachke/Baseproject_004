@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useEffect, useState,useRef } from 'react'
 import { connect } from 'react-redux'
 import AddFabButton from '../common/Fab/AddFabButton'
 import Table from '../common/table/Table'
@@ -6,7 +6,9 @@ import Column from '../common/table/Column'
 import { Redirect, withRouter } from 'react-router-dom'
 import {addusers} from '../Redux/ActionCreators'
 import { getUsers1 } from '../Redux/reducers/actions'
+import {useAltKey,useKey} from '../common/shortcurkeys'
 export const UserListComponent = (props: any) => {
+  const inpref:any = useRef(0)
   const [docno, setDocno] = useState('NO-ID')
   const [redirect, setRedirect] = useState(false)
   const setDocStatus = (id: string, redirect: boolean) => {
@@ -22,6 +24,7 @@ export const UserListComponent = (props: any) => {
     getUsers1({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((users:any)=>{
       if(props){
       props.addusers(users)
+      inpref.current.focus()
     }
     });
     return () => {
@@ -32,7 +35,7 @@ export const UserListComponent = (props: any) => {
   if(props.users){
     tabledata =useMemo(() => [...props.users], [props.users])
 }
-
+useAltKey("n",() =>{setDocStatus("NO-ID",true)})
   if (redirect) {
     let redirectpath = '/useredit?_id=' + docno
     return <Redirect push to={redirectpath} />
@@ -48,15 +51,17 @@ export const UserListComponent = (props: any) => {
                 actionColWidth={80}
                 headerText="User List"
                 addNew={setDocStatus}
+                onRowClick={setDocStatus}
+                searchref={inpref}
                 actions={[
-                  {
-                    action: (id: any) => {
-                      setDocStatus(id, true)
-                    },
-                    icon: 'fas fa-edit',
-                    text: 'Edit',
-                    className: 'table-button submit',
-                  },
+                  // {
+                  //   action: (id: any) => {
+                  //     setDocStatus(id, true)
+                  //   },
+                  //   icon: 'fas fa-edit',
+                  //   text: 'Edit',
+                  //   className: 'table-button submit',
+                  // },
                   {
                     action: (id: any) => {
                       alert(id)

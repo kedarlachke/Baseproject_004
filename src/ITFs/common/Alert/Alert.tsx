@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import {useAltKey,useKey} from '../shortcurkeys'
 import './alert.css'
 function Alert({snackbaropen,snackbarseverity,handlesnackbarclose,snackbartext}:any) {
     const [displayAlert, setDisplayAlert] = useState(false);
     useEffect(() => {
         setDisplayAlert(snackbaropen)
-        setTimeout(()=>{handlesnackbarclose();setDisplayAlert(false)},5000)
+       const timer = setTimeout(()=>{handlesnackbarclose();setDisplayAlert(false)},5000)
+       return () => clearTimeout(timer);
     }, [snackbaropen])
     return (
         <div className={displayAlert?`alert ${snackbarseverity} show`:`alert ${snackbarseverity} hide`}>

@@ -4,12 +4,12 @@ import ColumnHead from './ColumnHead'
 import {Pagination} from './Pagination';
 import SMIconButton from './SMIconButton';
 function Table(props: any) {
-    let { data,actions,actionColWidth,headerText,addNew} = props
+    let { data,actions,actionColWidth,headerText,addNew,searchref,onRowClick} = props
     const [selectedColumn, setSelectedColumn] = useState("");
     const [order, setOrder] = useState("");
     const [activePage, setActivePage] = useState(1);
     const [filterdata, setFilter] = useState([]);
-    const [numberOfRecordsPerPage, setNumberOfRecordsPerPage] = useState(5)
+    const [numberOfRecordsPerPage, setNumberOfRecordsPerPage] = useState(50)
     function sortSelectedColumn(selectedcolumn: string, order: string) {
         setOrder(order);
         setSelectedColumn(selectedcolumn)
@@ -50,7 +50,7 @@ function Table(props: any) {
         let filteredData:any=[]
         for (let i = 0; i < data.length; i < i++) {
             for (let key of keys) {
-                if(data[i][key]?.includes(searchtext)){
+                if((data[i][key])?.toLowerCase()?.includes(searchtext?.toLowerCase())){
                     filteredData.push(data[i])
                     break;
                 }
@@ -69,7 +69,7 @@ function Table(props: any) {
                         {/* <div className="table-header-text">
                             <h3>{headerText}</h3><span>({data.length})</span>
                         </div> */}
-                        <div className="goble-search"><input placeholder="search" style={{height:'40px',fontSize:"16px"}} onChange={(e)=>{globalSearch(e.target.value)}}/><i className="fas fa-search"/></div>
+                        <div className="goble-search"><input ref={searchref} placeholder="search" style={{height:'40px',fontSize:"16px"}} onChange={(e)=>{globalSearch(e.target.value)}}/><i className="fas fa-search"/></div>
                         <button className="tabel-add-button" onClick={()=>addNew("NO-ID",true)}>Add new <span className="las la-arrow-right"></span></button>
                         
                     </div>
@@ -83,10 +83,10 @@ function Table(props: any) {
                                 </thead>
                                 <tbody>
                                     {pageData?.map((data: any,i:any) => { 
-                                    return (<tr key={"#"+i}>{props.children.map((ele: any,j:any) => {
+                                    return (<tr key={"#"+i} >{props.children.map((ele: any,j:any) => {
                                         const { fieldname, columnname,render,width } = ele.props
                                        
-                                        return <Column key={j+"#"+fieldname} data={data && data[fieldname]? data[fieldname]:""} />
+                                        return <Column key={j+"#"+fieldname} data={data && data[fieldname]? data[fieldname]:""} columnClick={onRowClick} id={data._id}/>
                                     })}
                                     {<Column data={<div className="table-button-container">{actions.map((action:any,k:any)=>{
                                         return(<SMIconButton key={k+"#"+action.icon} action={action.action} id={data && data["_id"]? data["_id"]:""} icon={action.icon} className={action.className}/>)})}</div>}/>

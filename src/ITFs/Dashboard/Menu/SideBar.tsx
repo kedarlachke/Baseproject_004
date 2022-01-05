@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react'
 import { M_MenuItem } from './MenuItem'
 import {connect} from 'react-redux'
+import {useAltKey,useKey} from '../../common/shortcurkeys'
+import {Redirect,withRouter } from 'react-router-dom'
 import {handleSignoutUsernameJWT,checkCurrentUsernameJWT,ActionToDispatch,ActionToRedirect} from '../../Redux/reducers/actions'
 export function SideBar1(props: any) {
   const { selectcomponent } = props
@@ -69,6 +71,11 @@ export function SideBar1(props: any) {
       active: '',
     },
   ]
+  const redirectto=(redirectpath:String)=>{
+    return <Redirect push to={redirectpath} />
+  }
+  useAltKey("r",() =>{redirectto('/Recommendations')})
+  useAltKey("u",() =>{redirectto('/Users')})
   const [activeMenu, setActiveMenu] = useState(menuList[0].name)
   console.log('side bar')
   function selectItem(menuItem: string) {
@@ -138,4 +145,4 @@ export function SideBar1(props: any) {
   )
 }
 
-export const SideBar= connect(null,{ ActionToDispatch,ActionToRedirect})(SideBar1)
+export const SideBar= withRouter(connect(null,{ ActionToDispatch,ActionToRedirect})(SideBar1))

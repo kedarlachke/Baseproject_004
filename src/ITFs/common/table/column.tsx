@@ -1,9 +1,9 @@
 import React from 'react'
 
 function Column(props:any) {
-    const{data, width} = props
+    const{data, width,id,columnClick} = props
     return (        
-            <td key={data} width={width}>{data}</td>        
+            <td key={data} width={width} onClick={()=>{id?columnClick(id,true):()=>{}}}>{data}</td>        
     )
 }
 
