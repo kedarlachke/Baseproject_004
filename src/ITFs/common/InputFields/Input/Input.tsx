@@ -15,11 +15,12 @@ interface Iinput {
   currdoc: any,
   section: string,
   cal?:string,
-  modifydoc:any
+  modifydoc:any,
+  inpref?:any
 }
 
 export function Input(props: Iinput) {
-  const { wd, label, name, section, currdoc,modifydoc,cal } = props
+  const { wd, label, name, section, currdoc,modifydoc,cal,inpref } = props
   let classname = 'input-field'
   const errorMsg = getErrorValueN(currdoc, 'errorsAll.' + section)
   if (errorMsg !== null) {
@@ -36,7 +37,7 @@ export function Input(props: Iinput) {
           autoComplete="off"
           required
           placeholder=" "
-
+          ref={inpref}
           value={getValue(currdoc, section)}
           onChange={(event) => { setCalValue(currdoc, section, event.target.value, modifydoc, cal) }}
           onBlur={event => modifydoc(setValue(currdoc, 'touched.' + section, true))}

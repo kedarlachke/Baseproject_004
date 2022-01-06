@@ -5,31 +5,41 @@ import Table from '../common/table/Table'
 import Column from '../common/table/Column'
 import { Redirect, withRouter } from 'react-router-dom'
 import {addusers} from '../Redux/ActionCreators'
-import { getRecommendations } from '../Redux/reducers/actions'
+//import { getRecommendations } from '../Redux/reducers/actions'
+import useSaveAction from '../Hooks/useSaveAction'
 import * as doctypes from '../common/Doctypes';
 import {useAltKey,useKey} from '../common/shortcurkeys'
+import Loader from '../common/Loader/Loader'
+import {handleDelete, getRecommendations,handleSave} from './CrudRecommendation'
+import Messagesnackbar from '../common/Alert/Alert'
+import AlertDialog from '../common/PopupModals/ConfirmationModal'
 export const UserListComponent = (props: any) => {
 const inpref:any = useRef(0)
   const{recommendatios} = props
   const [docno, setDocno] = useState('NO-ID')
-  const [redirect, setRedirect] = useState(false)
+  const doctype= doctypes.RECOMMENDATION;
+  const doctypetext= 'Recommendation';
+  const resetFocus =()=>{
+    setTimeout(()=>inpref.current.focus(),1000)
+   }
   const [recommendations, setRecommendations] = useState([]) 
+  const [loaderDisplay, setloaderDisplay] = useState(false)
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,()=>{},doctype,doctypetext,resetFocus)
+  const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   const setDocStatus = (id: string, redirect: boolean) => {
     setDocno(id)
     setRedirect(redirect)
   }
-  const goback = () => {
-    setDocno('')
-    setRedirect(redirect)
-  }
-
-  useEffect(() => {
+const loadDataTable=()=>{
+  setloaderDisplay(!loaderDisplay)
     getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN'}).then((data:any)=>{
-      if(props){
         setRecommendations(data)
+        setloaderDisplay(loaderDisplay)
         inpref.current.focus()
-    }
     });
+}
+  useEffect(() => {
+    loadDataTable();
     return () => {
       
     }
@@ -45,6 +55,7 @@ useAltKey("n",() =>{setDocStatus("NO-ID",true)})
   } else
     return (
       <div className="projects">
+        <Loader display={loaderDisplay}/>
         <div className="card">
           <div className="card-body">
             
@@ -67,7 +78,9 @@ useAltKey("n",() =>{setDocStatus("NO-ID",true)})
                   // },
                   {
                     action: (id: any) => {
-                      alert(id)
+                      currentdocument["_id"]=id;
+                      setDocumentAction('delete')
+                      loadDataTable();
                     },
                     icon: 'fas fa-trash-alt',
                     text: 'delete',
@@ -84,6 +97,8 @@ useAltKey("n",() =>{setDocStatus("NO-ID",true)})
             
           </div>
         </div>
+        <AlertDialog open={action}  handleno={noaction} handleyes={yesaction} dailogtext={dailogtext} dailogtitle={dailogtitle}/>           
+      <Messagesnackbar snackbaropen={documentstatus.snackbaropen} snackbarseverity={documentstatus.snackbarseverity} handlesnackbarclose={closeSnackBar} snackbartext={documentstatus.snackbartext}/>
         <AddFabButton action={setDocStatus} />
       </div>
     )

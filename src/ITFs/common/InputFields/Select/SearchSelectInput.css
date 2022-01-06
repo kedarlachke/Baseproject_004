@@ -1,9 +1,9 @@
-.container {
-  margin-top: 100px;
-  padding: 32px;
+ .container {
+  /* margin-top: 100px; */
+  /* padding: 32px; */
 }
 
-.select-box {
+/*.select-box {
   display: flex;
   width: 400px;
   flex-direction: column;
@@ -85,4 +85,4 @@
 
 .select-box .option .radio {
   display: none;
-}
+} */

@@ -4,9 +4,10 @@ import {initDocumentstatus,newDocument} from '../common/constant'
 
 function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doctype:String,doctypetext:String,
   resetFocus:any ) {
-        const [currentdocument, modifydocument] = useState({})
+  const [currentdocument, modifydocument] = useState({})
+  const [loaderDisplay, setloaderDisplay] = useState(false)
   const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
-  const [redirect, goBack] = useState(false)
+  const [redirect, setRedirect] = useState(false)
   const doctyp= doctype
   const doctyptxt= doctypetext
   const closeSnackBar=()=>{
@@ -31,25 +32,26 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
         let docstatus = {...documentstatus}
         switch (action_type) {
           case 'delete':
-            docstatus = {...documentstatus}
-            docstatus.action= true;
-            docstatus.dailogtitle= doctypetext + ' Deletion';
-            docstatus.dailogtext= 'Delete ' + doctypetext + '?'
-            docstatus.yesaction= async () => {
-              await handleDelete(currentDoc._id)
-              modifydocument(newDocument(doctype,doctypetext))
-                docstatus.action= false;
-                docstatus.snackbaropen=true;
-                docstatus.snackbarseverity='success';
-                docstatus.snackbartext= doctypetext + ' Deleted'
-                setDocumentstatus({...docstatus})
-            }
-              docstatus.noaction= () => {
-              docstatus.action = false;
-              setDocumentstatus({...docstatus})
-            }
-            setDocumentstatus(docstatus);
-            resetFocus()
+            deleteDocument(docstatus,currentDoc)
+            // docstatus = {...documentstatus}
+            // docstatus.action= true;
+            // docstatus.dailogtitle= doctypetext + ' Deletion';
+            // docstatus.dailogtext= 'Delete ' + doctypetext + '?'
+            // docstatus.yesaction= async () => {
+            //   await handleDelete(currentDoc._id)
+            //   modifydocument(newDocument(doctype,doctypetext))
+            //     docstatus.action= false;
+            //     docstatus.snackbaropen=true;
+            //     docstatus.snackbarseverity='success';
+            //     docstatus.snackbartext= doctypetext + ' Deleted'
+            //     setDocumentstatus({...docstatus})
+            // }
+            //   docstatus.noaction= () => {
+            //   docstatus.action = false;
+            //   setDocumentstatus({...docstatus})
+            // }
+            // setDocumentstatus(docstatus);
+            // resetFocus()
             break;
           case 'clear':
             docstatus = {...documentstatus}
@@ -103,7 +105,48 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
             break;
         }
       }
-      return [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]
+
+      const setDocumentDeleteAction = async (action: string) => {
+        let currentDoc:any = { ...currentdocument }
+        currentDoc.doctype = doctyp;
+        currentDoc.doctypetext=doctyptxt;
+        const { doctypetext, docnoprefix, doctype } = currentDoc;
+        let action_type = '';
+        let isNew = false;
+        if (action == 'save_new') {
+          action_type = 'save';
+          isNew = true;
+        }
+        else {
+          action_type = action
+        }
+        let docstatus = {...documentstatus}
+        deleteDocument(docstatus,currentDoc)
+
+      }
+
+      const deleteDocument=async(docstatus:any,currentDoc:any)=>{
+        docstatus = {...documentstatus}
+            docstatus.action= true;
+            docstatus.dailogtitle= doctypetext + ' Deletion';
+            docstatus.dailogtext= 'Delete ' + doctypetext + '?'
+            docstatus.yesaction= async () => {
+              await handleDelete(currentDoc._id)
+              modifydocument(newDocument(doctype,doctypetext))
+                docstatus.action= false;
+                docstatus.snackbaropen=true;
+                docstatus.snackbarseverity='success';
+                docstatus.snackbartext= doctypetext + ' Deleted'
+                setDocumentstatus({...docstatus})
+            }
+              docstatus.noaction= () => {
+              docstatus.action = false;
+              setDocumentstatus({...docstatus})
+            }
+            setDocumentstatus(docstatus);
+            resetFocus()
+      }
+      return [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar,loaderDisplay, setloaderDisplay,deleteDocument]
 }
 
 export default useSaveAction

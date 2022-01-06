@@ -13,7 +13,6 @@ import {runCheck,requiredCheck,getDtFormat,getTimeFormat,getFromToDate,getDateYY
   setErrorValue,getValue,setValue} from '../common/validationlib';
  import {Redirect,withRouter } from 'react-router-dom'
 import AppbarBottom from '../common/AppBarBottom/AppbarBottom'
-import Option  from './arrNames'
 import {initDocumentstatus,newDocument} from '../common/constant'
 import {fetchStocks,addstocks} from '../Redux/ActionCreators'
 import { connect } from 'react-redux';
@@ -71,25 +70,27 @@ export const RecommendationComponent = (props: any) => {
   const resetFocus =()=>{
     setTimeout(()=>compinp.current.focus(),1000)
    }
-  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar,loaderDisplay, setloaderDisplay]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
   const [stocklist, setstocklist] = useState([])
-  const [loaderDisplay, setloaderDisplay] = useState(false)
+  
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
       compinp.current.focus()
        if(_id!='NO-ID'){
+        setloaderDisplay(!loaderDisplay)
            getRecommendations({applicationid:'15001500',client:'45004500',lang: 'EN', _id}).then((data:any)=>{ 
                 modifydocument(data[0])
+                setloaderDisplay(loaderDisplay)
             });
         }
         if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}        
     }, [])
 const getStockcmp=()=>{
-  setloaderDisplay(true);compinp.current.focus()
+  setloaderDisplay(!loaderDisplay);compinp.current.focus()
     fetchStocks({},
 
 (err:any,result:any):any=> {
-            if(err=='') {  console.log(result); props.addstocks(result);setloaderDisplay(false)  }
+            if(err=='') {  console.log(result); props.addstocks(result);setloaderDisplay(!loaderDisplay)  }
             else   {console.log(err,result)} })
           }
    

@@ -8,6 +8,7 @@ import {
   getDateYYYYMMDDHHMI,
   getFromToDate
 } from '../../validationlib';
+import { FlatInput } from '../Input/Input';
 interface Iinput {
   wd?: string
   label: string
@@ -46,47 +47,48 @@ export function Input(props: Iinput) {
 
           <div className="option">
             <input type="radio" className="radio" id="film" name="category" />
-            <label for="film">Film & Animation</label>
+            <label htmlFor="film">Film & Animation</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="science" name="category" />
-            <label for="science">Science & Technology</label>
+            <label htmlFor="science">Science & Technology</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="art" name="category" />
-            <label for="art">Art</label>
+            <label htmlFor="art">Art</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="music" name="category" />
-            <label for="music">Music</label>
+            <label htmlFor="music">Music</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="travel" name="category" />
-            <label for="travel">Travel & Events</label>
+            <label htmlFor="travel">Travel & Events</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="sports" name="category" />
-            <label for="sports">Sports</label>
+            <label htmlFor="sports">Sports</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="news" name="category" />
-            <label for="news">News & Politics</label>
+            <label htmlFor="news">News & Politics</label>
           </div>
 
           <div className="option">
             <input type="radio" className="radio" id="tutorials" name="category" />
-            <label for="tutorials">Tutorials</label>
+            <label htmlFor="tutorials">Tutorials</label>
           </div>
         </div>
 
         <div className="selected">
-          Select Video Category
+        <FlatInput wd="3" label="Current market price" name="cmp" currdoc={{}} section={'cmp'} modifydoc={()=>{}} />
+
         </div>
       </div>
     </div>

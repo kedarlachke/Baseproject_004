@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState,useEffect,useRef } from 'react'
 import { AnyIfEmpty, connect } from 'react-redux'
 import { Button } from '../common/Button/Button'
 import DatePicker from '../common/DatePicker/DatePicker'
@@ -165,19 +165,27 @@ export const handleSaveCheck = (currentdocument:any, users:any) => {
 export const UserComponent = (props: any) => {
   const doctype= doctypes.USER;
   const doctypetext= 'Username';
+  const [loaderDisplay, setloaderDisplay] = useState(false)
+  const inpref:any = useRef(0)
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
        if(_id!='NO-ID')
         {
+          setloaderDisplay(!loaderDisplay)
          const curdoc= props.users.find((document:any)=>document._id==_id)
+         setloaderDisplay(loaderDisplay)
          modifydocument(curdoc)
         }
         if(_id=='NO-ID'){modifydocument(newDocument(doctype,doctypetext))}
+        inpref?.current?.focus()
         return () => {      
         }
     }, [])
-    const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext)
-
+    const resetFocus =()=>{
+      setTimeout(()=>inpref.current.focus(),1000)
+     }
+    const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
+    
   
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
   if(redirect){
@@ -188,11 +196,12 @@ export const UserComponent = (props: any) => {
   }else
   return (
     <>
+    <Loader display={loaderDisplay}/>
     <div className="container">
       <div className="grid">
         <div className="row">
 
-          <FlatInput wd="3" label="First Name" name="firstname" currdoc={currentdocument} section={'firstname'} modifydoc={modifydocument} />
+          <FlatInput inpref={inpref} wd="3" label="First Name" name="firstname" currdoc={currentdocument} section={'firstname'} modifydoc={modifydocument} />
           <FlatInput wd="3" label="Last Name" name="lastname" currdoc={currentdocument} section={'lastname'} modifydoc={modifydocument} />
           <FlatInput wd="6" label="Display Name" name="displayname" currdoc={currentdocument} section={'displayname'} modifydoc={modifydocument} />
         </div>
