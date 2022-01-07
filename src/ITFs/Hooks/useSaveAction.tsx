@@ -106,46 +106,7 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
         }
       }
 
-      const setDocumentDeleteAction = async (action: string) => {
-        let currentDoc:any = { ...currentdocument }
-        currentDoc.doctype = doctyp;
-        currentDoc.doctypetext=doctyptxt;
-        const { doctypetext, docnoprefix, doctype } = currentDoc;
-        let action_type = '';
-        let isNew = false;
-        if (action == 'save_new') {
-          action_type = 'save';
-          isNew = true;
-        }
-        else {
-          action_type = action
-        }
-        let docstatus = {...documentstatus}
-        deleteDocument(docstatus,currentDoc)
-
-      }
-
-      const deleteDocument=async(docstatus:any,currentDoc:any)=>{
-        docstatus = {...documentstatus}
-            docstatus.action= true;
-            docstatus.dailogtitle= doctypetext + ' Deletion';
-            docstatus.dailogtext= 'Delete ' + doctypetext + '?'
-            docstatus.yesaction= async () => {
-              await handleDelete(currentDoc._id)
-              modifydocument(newDocument(doctype,doctypetext))
-                docstatus.action= false;
-                docstatus.snackbaropen=true;
-                docstatus.snackbarseverity='success';
-                docstatus.snackbartext= doctypetext + ' Deleted'
-                setDocumentstatus({...docstatus})
-            }
-              docstatus.noaction= () => {
-              docstatus.action = false;
-              setDocumentstatus({...docstatus})
-            }
-            setDocumentstatus(docstatus);
-            resetFocus()
-      }
+      
       return [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar,loaderDisplay, setloaderDisplay,deleteDocument]
 }
 

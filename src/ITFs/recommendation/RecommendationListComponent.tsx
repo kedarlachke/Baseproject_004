@@ -13,7 +13,7 @@ import Loader from '../common/Loader/Loader'
 import {handleDelete, getRecommendations,handleSave} from './CrudRecommendation'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
-export const UserListComponent = (props: any) => {
+export const RecommendationListComponent = (props: any) => {
 const inpref:any = useRef(0)
   const{recommendatios} = props
   const [docno, setDocno] = useState('NO-ID')
@@ -22,7 +22,7 @@ const inpref:any = useRef(0)
   const resetFocus =()=>{
     setTimeout(()=>inpref.current.focus(),1000)
    }
-  const [recommendations, setRecommendations] = useState([]) 
+  const [recommendations, setRecommendations] = useState([])
   const [loaderDisplay, setloaderDisplay] = useState(false)
   const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,()=>{},doctype,doctypetext,resetFocus)
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
@@ -46,7 +46,7 @@ const loadDataTable=()=>{
   }, [])
   let tabledata:any = []
   if(recommendations){
-    tabledata =useMemo(() => [...recommendations], [recommendations])
+    tabledata =useMemo(() => [...recommendations], [])
 }
 useAltKey("n",() =>{setDocStatus("NO-ID",true)})
   if (redirect) {
@@ -105,9 +105,7 @@ useAltKey("n",() =>{setDocStatus("NO-ID",true)})
 }
 
 const mapStateToProps = (state: any) => {
-  console.log("-------documents----",state.documents.documents)
   const recdoc = state?.documents?.documents?.filter((document:any) => document.doctype==doctypes.RECOMMENDATION )
-  console.log("-------recdoc----",recdoc)
   return({
   users: state.documents.users,
   docnos: state.documents.docnos,
@@ -121,5 +119,5 @@ const mapdispatcherToProp=(dispatch:any)=>{
   }
 }
 export default withRouter(
-  connect(mapStateToProps,mapdispatcherToProp)(UserListComponent)
+  connect(mapStateToProps,mapdispatcherToProp)(RecommendationListComponent)
 )

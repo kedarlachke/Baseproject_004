@@ -14,7 +14,7 @@ import { Button } from '../common/Button/Button'
 import {connect} from 'react-redux'
 import UserComponent from '../User/UserComponent'
 import UserListComponent from '../User/UserListComponent'
-import RecommendationListComponent from '../recommendation/RecommendationListComponent'
+import RecommendationList from '../recommendation/RecommendationList'
 import RecommendationComponent from '../recommendation/RecommendationComponent'
 import {BrowserRouter as Rounter, Route, Switch} from 'react-router-dom'
 import { SearchSelectInput } from '../common/InputFields/Select/SearchSelectInput'
@@ -122,7 +122,7 @@ function Dashboard(props: any) {
               <UserComponent {...props}/>
             </Route>
             <Route exact path="/Recommendations">
-              <RecommendationListComponent {...props}/>
+              <RecommendationList {...props}/>
             </Route>
             <Route exact path="/recommendationedit">
               <RecommendationComponent {...props}/>
