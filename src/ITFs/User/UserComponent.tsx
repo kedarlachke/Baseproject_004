@@ -165,7 +165,10 @@ export const handleSaveCheck = (currentdocument:any, users:any) => {
 export const UserComponent = (props: any) => {
   const doctype= doctypes.USER;
   const doctypetext= 'Username';
-  const [loaderDisplay, setloaderDisplay] = useState(false)
+  const resetFocus =()=>{
+    setTimeout(()=>inpref.current.focus(),1000)
+   }
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar,loaderDisplay, setloaderDisplay]:any = useSaveAction(handleSave,handleSaveCheck,doctype,doctypetext,resetFocus,deleteUser)
   const inpref:any = useRef(0)
      useEffect(() => {
       let _id=new URLSearchParams(props.location.search).get("_id")
@@ -181,10 +184,8 @@ export const UserComponent = (props: any) => {
         return () => {      
         }
     }, [])
-    const resetFocus =()=>{
-      setTimeout(()=>inpref.current.focus(),1000)
-     }
-    const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
+    
+    
     
   
   const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
