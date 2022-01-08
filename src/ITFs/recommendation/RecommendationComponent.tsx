@@ -18,6 +18,7 @@ import {fetchStocks,addstocks} from '../Redux/ActionCreators'
 import { connect } from 'react-redux';
 import  * as ActionTypes from '../Redux/ActionTypes'
 import Loader from '../common/Loader/Loader'
+import deleteGQL from '../mutations/DeleteRecommendation'
 
 export const handleSaveCheck = (currentdocument:any) => {
   const { touched, name, recodate, cmp, addupto, sl,target1,target2,weightage,timeframe,validatemode } = currentdocument;
@@ -70,7 +71,7 @@ export const RecommendationComponent = (props: any) => {
   const resetFocus =()=>{
     setTimeout(()=>compinp.current.focus(),1000)
    }
-  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar,loaderDisplay, setloaderDisplay]:any = useSaveAction(handleDelete, handleSave,handleSaveCheck,doctype,doctypetext,resetFocus)
+  const [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, goBack,closeSnackBar,loaderDisplay, setloaderDisplay]:any = useSaveAction(handleSave,handleSaveCheck,doctype,doctypetext,resetFocus,deleteGQL)
   const [stocklist, setstocklist] = useState([])
   
      useEffect(() => {

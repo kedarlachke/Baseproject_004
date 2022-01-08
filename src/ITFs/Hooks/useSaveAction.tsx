@@ -1,20 +1,20 @@
-import {useState} from 'react'
+import {useState,useCallback} from 'react'
 import { getDocumenForSave } from '../common/CommonLogic';
 import {initDocumentstatus,newDocument} from '../common/constant'
-
-function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doctype:String,doctypetext:String,
-  resetFocus:any ) {
+import { execGql, execGql_xx } from '../gqlclientconfig';
+function useSaveAction( handleSave:any,handleSaveCheck:any,doctype:String,doctypetext:String,
+  resetFocus:any,deleteGraphQuery:any ) {
   const [currentdocument, modifydocument] = useState({})
   const [loaderDisplay, setloaderDisplay] = useState(false)
   const [documentstatus, setDocumentstatus] = useState(initDocumentstatus)
   const [redirect, setRedirect] = useState(false)
   const doctyp= doctype
   const doctyptxt= doctypetext
-  const closeSnackBar=()=>{
+  const closeSnackBar=useCallback(()=>{
     let docstatus={...documentstatus}
       docstatus.snackbaropen=false;
     setDocumentstatus(docstatus)
-  }
+  },[1])
     const setDocumentAction = async (action: string) => {
         let currentDoc:any = { ...currentdocument }
         currentDoc.doctype = doctyp;
@@ -32,26 +32,26 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
         let docstatus = {...documentstatus}
         switch (action_type) {
           case 'delete':
-            deleteDocument(docstatus,currentDoc)
-            // docstatus = {...documentstatus}
-            // docstatus.action= true;
-            // docstatus.dailogtitle= doctypetext + ' Deletion';
-            // docstatus.dailogtext= 'Delete ' + doctypetext + '?'
-            // docstatus.yesaction= async () => {
-            //   await handleDelete(currentDoc._id)
-            //   modifydocument(newDocument(doctype,doctypetext))
-            //     docstatus.action= false;
-            //     docstatus.snackbaropen=true;
-            //     docstatus.snackbarseverity='success';
-            //     docstatus.snackbartext= doctypetext + ' Deleted'
-            //     setDocumentstatus({...docstatus})
-            // }
-            //   docstatus.noaction= () => {
-            //   docstatus.action = false;
-            //   setDocumentstatus({...docstatus})
-            // }
-            // setDocumentstatus(docstatus);
-            // resetFocus()
+            
+            docstatus = {...documentstatus}
+            docstatus.action= true;
+            docstatus.dailogtitle= doctypetext + ' Deletion';
+            docstatus.dailogtext= 'Delete ' + doctypetext + '?'
+            docstatus.yesaction= async () => {
+              await handleDelete(currentDoc._id)
+              modifydocument(newDocument(doctype,doctypetext))
+                docstatus.action= false;
+                docstatus.snackbaropen=true;
+                docstatus.snackbarseverity='success';
+                docstatus.snackbartext= doctypetext + ' Deleted'
+                setDocumentstatus({...docstatus})
+            }
+              docstatus.noaction= () => {
+              docstatus.action = false;
+              setDocumentstatus({...docstatus})
+            }
+            setDocumentstatus(docstatus);
+            resetFocus()
             break;
           case 'clear':
             docstatus = {...documentstatus}
@@ -105,9 +105,31 @@ function useSaveAction(handleDelete:any, handleSave:any,handleSaveCheck:any,doct
             break;
         }
       }
-
+      const handleDelete = async (_id: String) => {
+        return new Promise(async (resolve, reject) => {
+         var result: any = '', errorMessage = '', errors = new Array();
+         try {
+           result = await execGql('mutation', deleteGraphQuery, { _id })
+           if (!result) {
+           console.log({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+           reject({ "errors": [], "errorMessage": 'No errors and results from GQL' })
+           // return callback({"errors":[],"errorMessage":'No errors and results from GQL'} ,'');
+         } else {
+           resolve(result.data)
+           return result.data;
+         }
+         }catch (err:any) {
+           errors = err.errorsGql;
+           errorMessage = err.errorMessageGql;
+           console.log({ "errors": errors, "errorMessage": errorMessage })
+           reject({ "errors": errors, "errorMessage": errorMessage })
+           // return callback({"errors":errors,"errorMessage":errorMessage},'' );
+         }
+        })
+       
+     }
       
-      return [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar,loaderDisplay, setloaderDisplay,deleteDocument]
+      return [setDocumentAction,documentstatus,setDocumentstatus,currentdocument,modifydocument,redirect, setRedirect,closeSnackBar,loaderDisplay, setloaderDisplay]
 }
 
 export default useSaveAction

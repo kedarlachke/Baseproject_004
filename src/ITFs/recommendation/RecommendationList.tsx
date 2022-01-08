@@ -1,23 +1,21 @@
-import React, { useMemo, useEffect, useState,useRef } from 'react'
-import { connect } from 'react-redux'
-import AddFabButton from '../common/Fab/AddFabButton'
+import React, { useMemo, useEffect, useState,useRef,useCallback } from 'react'
 import Table from '../common/table/Table'
 import Column from '../common/table/Column'
 import { Redirect, withRouter } from 'react-router-dom'
-import {addusers} from '../Redux/ActionCreators'
-//import { getRecommendations } from '../Redux/reducers/actions'
-import useSaveAction from '../Hooks/useSaveAction'
-import recommendationsQuery from '../queries/recommendationQuery'
+import fetchGQL from '../queries/recommendationQuery'
+import deleteGQL from '../mutations/DeleteRecommendation'
 import useTableAction from '../Hooks/useTableAction'
-import * as doctypes from '../common/Doctypes';
 import {useAltKey,useKey} from '../common/shortcurkeys'
 import Loader from '../common/Loader/Loader'
-import {handleDelete, getRecommendations,handleSave} from './CrudRecommendation'
 import Messagesnackbar from '../common/Alert/Alert'
 import AlertDialog from '../common/PopupModals/ConfirmationModal'
 function RecommendationList() {
-   const query = useMemo(()=>(recommendationsQuery),[1])
-   const [tableData,loaderDisplay,docno, setDocno,redirect, setRedirect]:any=useTableAction(query,"recommendation")
+
+   const fetchquery = useMemo(()=>(fetchGQL),[1])
+   const deletequery = useMemo(()=>(deleteGQL),[1])
+   const [tableData,loaderDisplay,docno, setDocno,redirect, setRedirect,documentstatus,deleteDocument,closeSnackBar]:any=useTableAction(fetchquery,"recommendation",deletequery)
+   useAltKey("n",() =>{setDocStatus("NO-ID",true)})
+   const inpref:any = useRef(0)
    let tabledata:any=[]
    if(tableData) {
     tabledata= [...tableData]
@@ -26,6 +24,12 @@ function RecommendationList() {
     setDocno(id)
     setRedirect(redirect)
   }
+
+  const M_setDocStatus = useCallback((id,redirect) => {setDocStatus(id,redirect)},[1],)
+  const {action,yesaction,noaction,dailogtext,dailogtitle} = documentstatus;
+  if(inpref.current.focus){
+  inpref.current.focus()
+}
   if (redirect) {
     let redirectpath = '/recommendationedit?_id=' + docno
     return <Redirect push to={redirectpath} /> 
@@ -39,9 +43,9 @@ function RecommendationList() {
                 defaultNoOfRows={10}
                 actionColWidth={80}
                 headerText="User List"
-                 addNew={setDocStatus}
-                 onRowClick={setDocStatus}
-                // searchref={inpref}
+                 addNew={M_setDocStatus}
+                 onRowClick={M_setDocStatus}
+                 searchref={inpref}
                 actions={[
                   // {
                   //   action: (id: any) => {
@@ -52,11 +56,8 @@ function RecommendationList() {
                   //   className: 'table-button submit',
                   // },
                   {
-                    action: (id: any) => {
-                        alert("delete")
-                    //   currentdocument["_id"]=id;
-                    //   setDocumentAction('delete')
-                    //   loadDataTable();
+                    action: (id: String) => {
+                        deleteDocument(id)
                     },
                     icon: 'fas fa-trash-alt',
                     text: 'delete',
@@ -72,6 +73,9 @@ function RecommendationList() {
               </Table>
               
         </div>
+        <AlertDialog open={action}  handleno={noaction} handleyes={yesaction} dailogtext={dailogtext} dailogtitle={dailogtitle}/>           
+        <Messagesnackbar snackbaropen={documentstatus.snackbaropen} snackbarseverity={documentstatus.snackbarseverity} handlesnackbarclose={closeSnackBar} snackbartext={documentstatus.snackbartext}/>                    
+
         </div>
     )
 }
